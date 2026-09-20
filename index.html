@@ -255,7 +255,8 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbyHll6QgzCJTbkRMP1QSt3yL7MVA90RVfUGUXNdFgeMyThd8mwk7EW_ofn4VHM3Rl1C/exec";
         const MEMBERS = ["경민", "다인", "다은", "보현"];
         const TEA_TYPES = ["녹차", "홍차", "우롱차", "흑차", "백차", "황차", "허브티/블렌디드", "말차", "티음료"];
-        
+// 4명의 멤버 전용 비밀번호 설정
+        const MEMBER_PASSWORD = "duck2026";
         const LIQUOR_COLORS = [
             { name: "투명/맑음", hex: "#FAF8F5", border: "#E3DFD5" },
             { name: "연한 황록색", hex: "#E2ECC8", border: "#C5D89E" },
@@ -399,7 +400,18 @@
             }
         }
 
+       // 4명의 멤버 전용 비밀번호 설정
+        const MEMBER_PASSWORD = "duck2026";
+
         function openGatheringModal() {
+            const password = prompt("멤버 전용 비밀번호를 입력해주세요:");
+            if (password !== MEMBER_PASSWORD) {
+                if (password !== null) {
+                    showToast("비밀번호가 일치하지 않습니다. (멤버 전용)");
+                }
+                return;
+            }
+
             document.getElementById('gathering-form').reset();
             document.getElementById('g-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('gathering-modal').classList.remove('hidden');
@@ -445,6 +457,28 @@
                 showToast("먼저 등록된 찻자리 카드가 없습니다!");
                 return;
             }
+
+            const password = prompt("멤버 전용 비밀번호를 입력해주세요:");
+            if (password !== MEMBER_PASSWORD) {
+                if (password !== null) {
+                    showToast("비밀번호가 일치하지 않습니다. (멤버 전용)");
+                }
+                return;
+            }
+
+            const selectEl = document.getElementById('rec-gathering-id');
+            selectEl.innerHTML = '';
+            gatherings.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.id;
+                opt.textContent = `[${g.date}] ${g.teahouse} (${g.region})`;
+                selectEl.appendChild(opt);
+            });
+
+            document.getElementById('modal-tea-items-container').innerHTML = '';
+            addModalTeaItem();
+            document.getElementById('record-modal').classList.remove('hidden');
+        }
 
             const selectEl = document.getElementById('rec-gathering-id');
             selectEl.innerHTML = '';
