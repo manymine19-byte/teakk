@@ -3,844 +3,765 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>티크크 - 우리의 찻자리 기록장</title>
+    <title>티크크 - 찻자리 기록장</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter & Noto Serif KR) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #8C6D53;
-            --primary-light: #F4EFEA;
-            --accent: #D9886A;
-            --bg: #FAFAF7;
-            --card-bg: #FFFFFF;
-            --text-main: #333333;
-            --text-sub: #777777;
-            --border: #E5E0DA;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            padding-bottom: 90px;
+            font-family: 'Inter', 'Noto Serif KR', sans-serif;
+            background-color: #FBF9F5;
+            color: #3C3633;
         }
-
-        header {
-            background-color: var(--card-bg);
-            padding: 18px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        .font-serif-kr {
+            font-family: 'Noto Serif KR', serif;
         }
-
-        header h1 {
-            font-size: 1.2rem;
-            color: var(--primary);
-            font-weight: 700;
-            letter-spacing: 1px;
+        ::-webkit-scrollbar {
+            width: 4px;
         }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 16px;
+        ::-webkit-scrollbar-track {
+            background: #F1EFE7;
         }
-
-        /* 탭 콘텐츠 */
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-
-        /* 12잔 트래커 */
-        .tracker-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            border: 1px solid var(--border);
-            text-align: center;
-        }
-
-        .tracker-title {
-            font-size: 0.9rem;
-            color: var(--text-sub);
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-
-        .cups-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            justify-items: center;
-        }
-
-        .cup-item {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .cup-item.filled {
-            background: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 2px 6px rgba(140, 109, 83, 0.3);
-        }
-
-        .cup-item svg {
-            width: 20px;
-            height: 20px;
-            fill: #C4B5A5;
-        }
-
-        .cup-item.filled svg {
-            fill: #FFFFFF;
-        }
-
-        /* 버튼 스타일 */
-        .btn-primary {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(140, 109, 83, 0.2);
-            transition: background 0.2s;
-        }
-
-        .btn-primary:active {
-            background-color: #73553e;
-        }
-
-        /* 찻자리 카드 목록 */
-        .session-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-        }
-
-        .session-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--primary-light);
-        }
-
-        .session-date-location {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 4px;
-        }
-
-        .session-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .session-badge {
-            background: var(--primary-light);
-            color: var(--primary);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .session-desc {
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            background: var(--bg);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 14px;
-        }
-
-        /* 차 중심 리스트 스타일 */
-        .tea-group-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .tea-group-item {
-            background: #FCFCFA;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-        }
-
-        .tea-group-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        .color-dots {
-            display: flex;
-            gap: 4px;
-        }
-
-        .color-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .tea-group-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-main);
-        }
-
-        .tea-group-type {
-            font-size: 0.75rem;
-            color: var(--text-sub);
-            background: #EFECE6;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .member-tasting-row {
-            font-size: 0.85rem;
-            padding: 4px 0 4px 10px;
-            border-left: 2px solid var(--accent);
-            margin-top: 4px;
-            display: flex;
-            gap: 8px;
-            color: #555;
-        }
-
-        .member-tasting-name {
-            font-weight: 600;
-            color: var(--primary);
-            min-width: 35px;
-        }
-
-        /* 로그 탭 스타일 */
-        .log-member-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-        }
-
-        .log-member-name {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .log-tea-card {
-            background: var(--bg);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .log-tea-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .log-tea-title {
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .log-tea-details {
-            font-size: 0.82rem;
-            color: var(--text-sub);
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-
-        /* 하단 네비게이션 탭 */
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: var(--card-bg);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 100;
-        }
-
-        .nav-item {
-            text-align: center;
-            color: var(--text-sub);
-            font-size: 0.8rem;
-            cursor: pointer;
-            flex: 1;
-            font-weight: 500;
-        }
-
-        .nav-item.active {
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        /* 모달 스타일 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 200;
-            justify-content: center;
-            align-items: flex-end;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            border-radius: 20px 20px 0 0;
-            padding: 24px;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header h2 {
-            font-size: 1.15rem;
-            color: var(--primary);
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--text-sub);
-        }
-
-        /* 폼 요소 스타일 */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-main);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            background: var(--bg);
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: #fff;
-        }
-
-        .member-section-box {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 14px;
-        }
-
-        .member-section-title {
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 0.95rem;
-            margin-bottom: 10px;
-        }
-
-        .tea-entry-box {
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-            position: relative;
-        }
-
-        .btn-sub {
-            background: #EFECE6;
-            color: var(--text-main);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 6px;
-        }
-
-        .btn-danger {
-            background: #FFEBEB;
-            color: #D9534F;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            float: right;
-        }
-
-        /* 컬러 팔레트 선택 */
-        .color-picker-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 6px;
-        }
-
-        .color-option {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-        }
-
-        .color-option.selected {
-            border-color: var(--primary);
-            transform: scale(1.1);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-sub);
-            font-size: 0.9rem;
+        ::-webkit-scrollbar-thumb {
+            background: #D8D2C4;
+            border-radius: 2px;
         }
     </style>
 </head>
-<body>
+<body class="bg-[#FBF9F5] text-[#3C3633] min-h-screen flex flex-col antialiased">
 
-    <header>
-        <h1>티크크 (Teakkk)</h1>
+    <!-- Header -->
+    <header class="bg-[#EFECE6] border-b border-[#E3DFD5] sticky top-0 z-20 px-4 py-3.5 shadow-xs">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <span class="text-xl">🍵</span>
+                <div>
+                    <h1 class="font-serif-kr font-bold text-base text-[#5C524B] leading-tight">티크크</h1>
+                    <p class="text-[10px] text-[#8C8279]">함께 마신 차를 기록해요</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="openGatheringModal()" class="bg-[#EAE4D8] text-[#5C524B] text-xs font-medium px-3 py-2 rounded-full shadow-2xs hover:ْد transition flex items-center space-x-1">
+                    <i class="fa-solid fa-calendar-plus text-[10px]"></i>
+                    <span>찻자리 카드 등록</span>
+                </button>
+                <button onclick="openRecordModal()" class="bg-[#79553D] text-white text-xs font-medium px-3 py-2 rounded-full shadow hover:bg-[#624430] transition flex items-center space-x-1">
+                    <i class="fa-solid fa-plus text-[10px]"></i>
+                    <span>기록하기</span>
+                </button>
+            </div>
+        </div>
     </header>
 
-    <div class="container">
-        <!-- 홈 탭 -->
-        <div id="tab-home" class="tab-content active">
-            <!-- 12잔 트래커 -->
-            <div class="tracker-card">
-                <div class="tracker-title">우리의 찻자리 여정</div>
-                <div class="cups-grid" id="cupsGrid">
-                    <!-- 자바스크립트로 생성 -->
+    <!-- Main Container -->
+    <main class="flex-1 max-w-md w-full mx-auto p-4 pb-24 space-y-5">
+        
+        <!-- Tab Content: 홈 (Home) -->
+        <div id="tab-home" class="space-y-5 tab-content">
+            <!-- 1. Top 12 Teacups Tracker Section -->
+            <section class="bg-[#F5F2EC] border border-[#E8E2D5] rounded-2xl p-4 shadow-xs">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-serif-kr font-semibold text-xs text-[#79553D] uppercase tracking-wider">찻잔 달력</h3>
+                    <span id="tracker-count-label" class="text-[10px] text-[#8C8279]">0 / 12</span>
                 </div>
-            </div>
+                <p class="text-[11px] text-[#736A61] mb-3">찻자리 카드 등록하고 달력 채우기 도전</p>
+                
+                <!-- 12 Teacups Grid -->
+                <div id="teacups-grid" class="grid grid-cols-6 gap-2.5 pt-1">
+                    <!-- Dynamically rendered 12 teacups -->
+                </div>
+            </section>
 
-            <button class="btn-primary" onclick="openModal()">+ 찻자리 기록하기</button>
+            <!-- 2. Entire Gathering Records List (찻자리 카드 기록) -->
+            <div class="space-y-3 pt-1">
+                <div class="flex items-center justify-between px-1">
+                    <h3 class="font-serif-kr font-semibold text-xs text-[#79553D] uppercase tracking-wider">찻자리 카드 목록</h3>
+                    <span id="gathering-count" class="text-[10px] text-[#8C8279]">총 0개</span>
+                </div>
 
-            <!-- 찻자리 카드 목록 -->
-            <div id="sessionList">
-                <!-- 자바스크립트로 생성 -->
+                <div id="gatherings-container" class="space-y-4">
+                    <!-- Dynamically Rendered Gathering Cards -->
+                </div>
             </div>
         </div>
 
-        <!-- 로그 탭 -->
-        <div id="tab-log" class="tab-content">
-            <div id="logMemberList">
-                <!-- 자바스크립트로 생성 -->
+        <!-- Tab Content: 로그 (Log / Members Tea Archive) -->
+        <div id="tab-log" class="space-y-4 tab-content hidden">
+            <div class="bg-[#F5F2EC] border border-[#E8E2D5] rounded-2xl p-4 shadow-xs text-center">
+                <h2 class="font-serif-kr font-semibold text-sm text-[#4E433C]">찻자리 아카이빙</h2>
+                <p class="text-xs text-[#736A61] mt-1">각자 기록한 찻자리 노트를 볼 수 있어요</p>
+            </div>
+
+            <div class="space-y-3">
+                <div id="member-summary-cards" class="space-y-3">
+                    <!-- Dynamically Rendered Member Cards -->
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 하단 네비게이션 -->
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="switchTab('home')">홈</div>
-        <div class="nav-item" onclick="switchTab('log')">로그</div>
-    </div>
+        <!-- Empty State (Global) -->
+        <div id="empty-state" class="hidden text-center py-16 px-4">
+            <div class="text-4xl mb-3">🫖</div>
+            <p class="font-serif-kr text-base text-[#5C524B] mb-1">아직 등록된 찻자리가 없어요</p>
+            <p class="text-xs text-[#8C8279] mb-4">상단 '찻자리 카드 등록' 버튼을 눌러 모임을 먼저 생성해보세요!</p>
+        </div>
 
-    <!-- 기록하기 모달 -->
-    <div class="modal" id="recordModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>찻자리 기록하기</h2>
-                <button class="close-btn" onclick="closeModal()">✕</button>
+    </main>
+
+    <!-- Bottom Navigation Bar (Tabs) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#FBF9F5] border-t border-[#E3DFD5] py-2.5 px-6 z-10 shadow-lg">
+        <div class="max-w-md mx-auto flex justify-around items-center">
+            <button onclick="switchTab('home')" id="nav-btn-home" class="flex flex-col items-center space-y-1 text-[#79553D] font-medium transition">
+                <i class="fa-solid fa-house text-base"></i>
+                <span class="text-[11px]">홈</span>
+            </button>
+            <button onclick="switchTab('log')" id="nav-btn-log" class="flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition">
+                <i class="fa-solid fa-book-bookmark text-base"></i>
+                <span class="text-[11px]">로그</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Modal 1: 찻자리 카드 등록 모달 -->
+    <div id="gathering-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center sm:p-4 hidden transition-opacity">
+        <div class="bg-[#FBF9F5] w-full sm:max-w-lg max-h-[90vh] rounded-t-3xl sm:rounded-2xl shadow-xl flex flex-col overflow-hidden">
+            <div class="px-5 py-4 border-b border-[#E8E2D5] flex items-center justify-between bg-[#F5F2EC]">
+                <h3 class="font-serif-kr font-semibold text-sm text-[#4E433C]">찻자리 카드 등록하기</h3>
+                <button onclick="closeGatheringModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-[#736A61] hover:bg-[#EAE4D8] transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
-            <form id="recordForm" onsubmit="saveSession(event)">
-                <div class="form-group">
-                    <label>모임 날짜</label>
-                    <input type="date" id="mDate" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>날씨</label>
-                    <input type="text" id="mWeather" class="form-control" placeholder="예: 맑음, 비 옴, 선선함">
-                </div>
-                <div class="form-group">
-                    <label>티하우스 이름</label>
-                    <input type="text" id="tName" class="form-control" placeholder="예: 퀠리테, 절로 등" required>
-                </div>
-                <div class="form-group">
-                    <label>티하우스 지역</label>
-                    <input type="text" id="tRegion" class="form-control" placeholder="예: 서울 종로구, 연남동">
-                </div>
-                <div class="form-group">
-                    <label>이번 달 주제</label>
-                    <input type="text" id="tTheme" class="form-control" placeholder="예: 대만 우롱차 탐방">
-                </div>
-                <div class="form-group">
-                    <label>담당자</label>
-                    <select id="tManager" class="form-control">
-                        <option value="경민">경민</option>
-                        <option value="다인">다인</option>
-                        <option value="다은">다은</option>
-                        <option value="보현">보현</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>티하우스 / 찻집 설명</label>
-                    <textarea id="tDesc" class="form-control" rows="2" placeholder="예: 00찻집은 센차와 화과자가 유명한 곳"></textarea>
-                </div>
-
-                <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
-
-                <div class="form-group">
-                    <label style="font-size: 1rem; color: var(--primary);">티크크 기록장 (멤버별 마신 차)</label>
-                    <div id="memberInputsContainer">
-                        <!-- 멤버별 입력폼 동적 생성 -->
+            <div class="p-5 overflow-y-auto flex-1">
+                <form id="gathering-form" onsubmit="saveGatheringCard(event)" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">모임 날짜 *</label>
+                            <input type="date" id="g-date" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">날씨 *</label>
+                            <select id="g-weather" class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none">
+                                <option value="☀️ 맑음">☀️ 맑음</option>
+                                <option value="☁️ 흐림">☁️ 흐림</option>
+                                <option value="🌧️ 비">🌧️ 비</option>
+                                <option value="❄️ 눈">❄️ 눈</option>
+                                <option value="🍃 선선한 바람">🍃 선선한 바람</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <button type="submit" class="btn-primary" style="margin-top: 20px;">저장하기</button>
-            </form>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">티하우스 이름 *</label>
+                            <input type="text" id="g-teahouse" placeholder="예: 절영 티룸" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">티하우스 지역 *</label>
+                            <input type="text" id="g-region" placeholder="예: 서울 종로구" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">이번 달 주제</label>
+                            <input type="text" id="g-theme" placeholder="예: 백차 탐구" class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">담당자</label>
+                            <select id="g-manager" class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none">
+                                <option value="경민">경민</option>
+                                <option value="다인">다인</option>
+                                <option value="다은">다은</option>
+                                <option value="보현">보현</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-[#685D54] mb-1">티하우스 설명</label>
+                        <input type="text" id="g-description" placeholder="예: 센차와 화과자가 유명한 곳" class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full bg-[#79553D] text-white py-3 rounded-xl font-medium text-xs shadow hover:bg-[#624430] transition">
+                            찻자리 카드 생성하기
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
+    <!-- Modal 2: 개인 기록하기 모달 -->
+    <div id="record-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center sm:p-4 hidden transition-opacity">
+        <div class="bg-[#FBF9F5] w-full sm:max-w-lg max-h-[90vh] rounded-t-3xl sm:rounded-2xl shadow-xl flex flex-col overflow-hidden">
+            <div class="px-5 py-4 border-b border-[#E8E2D5] flex items-center justify-between bg-[#F5F2EC]">
+                <h3 class="font-serif-kr font-semibold text-sm text-[#4E433C]">찻자리 기록 남기기</h3>
+                <button onclick="closeRecordModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-[#736A61] hover:bg-[#EAE4D8] transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1">
+                <form id="record-form" onsubmit="saveMemberRecords(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-[11px] font-medium text-[#685D54] mb-1">찻자리 선택 (티하우스) *</label>
+                        <select id="rec-gathering-id" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-[#685D54] mb-1">기록자 (멤버 선택) *</label>
+                        <select id="rec-member" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none">
+                            <option value="경민">경민</option>
+                            <option value="다인">다인</option>
+                            <option value="다은">다은</option>
+                            <option value="보현">보현</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-3 pt-2 border-t border-[#E8E2D5]">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-bold text-[#79553D] uppercase">마신 차 리스트</h4>
+                            <button type="button" onclick="addModalTeaItem()" class="text-xs text-[#79553D] font-medium bg-[#F5F2EC] px-2.5 py-1 rounded-md hover:bg-[#EAE4D8] transition">
+                                <i class="fa-solid fa-plus text-[9px]"></i> 차 추가하기
+                            </button>
+                        </div>
+                        <div id="modal-tea-items-container" class="space-y-3">
+                            <!-- Dynamic items -->
+                        </div>
+                    </div>
+
+                    <div class="pt-3">
+                        <button type="submit" class="w-full bg-[#79553D] text-white py-3 rounded-xl font-medium text-xs shadow hover:bg-[#624430] transition">
+                            내 기록 저장하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Message Box -->
+    <div id="toast" class="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-[#3C3633] text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+        알림 메시지입니다.
+    </div>
+
+    <!-- JavaScript Application Logic -->
     <script>
-        const MEMBERS = ['경민', '다인', '다은', '보현'];
-        const COLOR_PALETTE = [
-            '#FCE4EC', '#F8BBD0', '#FFF3E0', '#FFE0B2', 
-            '#E8F5E9', '#C8E6C9', '#E0F7FA', '#B2EBF2', '#EFEBE9'
+        const MEMBERS = ["경민", "다인", "다은", "보현"];
+        const TEA_TYPES = ["녹차", "홍차", "우롱차", "흑차", "백차", "황차", "허브티/블렌디드", "말차", "티음료"];
+        
+        const LIQUOR_COLORS = [
+            { name: "투명/맑음", hex: "#FAF8F5", border: "#E3DFD5" },
+            { name: "연한 황록색", hex: "#E2ECC8", border: "#C5D89E" },
+            { name: "황금빛 노랑", hex: "#FCE883", border: "#E4CC53" },
+            { name: "따뜻한 호박색", hex: "#F3C68F", border: "#D8A462" },
+            { name: "붉은 홍차색", hex: "#D97757", border: "#B55333" },
+            { name: "짙은 갈색", hex: "#8D5B4C", border: "#633C30" }
         ];
 
-        let sessions = JSON.parse(localStorage.getItem('teakkk_sessions')) || [];
+        let gatherings = [];
+        let memberExpandedState = {};
+        let currentTab = 'home';
 
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        window.onload = function() {
+            loadFromLocalStorage();
+            renderTracker();
+            renderGatherings();
+            renderMemberSummaries();
+            document.getElementById('g-date').value = new Date().toISOString().split('T')[0];
+        };
 
-            if(tabName === 'home') {
-                document.getElementById('tab-home').classList.add('active');
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2500);
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            const homeTab = document.getElementById('tab-home');
+            const logTab = document.getElementById('tab-log');
+            const btnHome = document.getElementById('nav-btn-home');
+            const btnLog = document.getElementById('nav-btn-log');
+
+            if (tab === 'home') {
+                homeTab.classList.remove('hidden');
+                logTab.classList.add('hidden');
+                btnHome.className = "flex flex-col items-center space-y-1 text-[#79553D] font-medium transition";
+                btnLog.className = "flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition";
             } else {
-                document.getElementById('tab-log').classList.add('active');
-                document.querySelectorAll('.nav-item')[1].classList.add('active');
-                renderLogs();
+                homeTab.classList.add('hidden');
+                logTab.classList.remove('hidden');
+                btnLog.className = "flex flex-col items-center space-y-1 text-[#79553D] font-medium transition";
+                btnHome.className = "flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition";
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('teakkk_gatherings_v2');
+            if (saved) {
+                try {
+                    gatherings = JSON.parse(saved);
+                } catch(e) {
+                    gatherings = [];
+                }
+            } else {
+                gatherings = [
+                    {
+                        id: "sample-1",
+                        date: "2026-03-20",
+                        weather: "☀️ 맑음",
+                        teahouse: "고요한 찻집",
+                        region: "서울 마포구",
+                        theme: "봄맞이 우롱차 코스",
+                        manager: "경민",
+                        description: "고요한 분위기 속에서 대만 우롱차를 즐길 수 있는 아늑한 공간",
+                        memberRecords: {
+                            "경민": [
+                                { name: "대만 동정우롱", type: "우롱차", colorHex: "#F3C68F", colorName: "따뜻한 호박색", flavor: "구수한 곡물향, 은은한 난꽃향", snack: "말차 화과자", memo: "여운이 김" }
+                            ],
+                            "다인": [
+                                { name: "대만 동정우롱", type: "우롱차", colorHex: "#F3C68F", colorName: "따뜻한 호박색", flavor: "난꽃향이 부드럽게 감돌음", snack: "양갱", memo: "맛있음" }
+                            ]
+                        }
+                    }
+                ];
+                saveToLocalStorage();
             }
         }
 
-        function openModal() {
-            document.getElementById('recordModal').classList.add('active');
-            document.getElementById('mDate').valueAsDate = new Date();
-            initMemberInputs();
-        }
-
-        function closeModal() {
-            document.getElementById('recordModal').classList.remove('active');
-        }
-
-        function initMemberInputs() {
-            const container = document.getElementById('memberInputsContainer');
-            container.innerHTML = '';
-
-            MEMBERS.forEach(member => {
-                let box = document.createElement('div');
-                box.className = 'member-section-box';
-                box.innerHTML = `
-                    <div class="member-section-title">${member}</div>
-                    <div id="tea-list-${member}"></div>
-                    <button type="button" class="btn-sub" onclick="addTeaField('${member}')">+ 차 추가하기</button>
-                `;
-                container.appendChild(box);
-                addTeaField(member);
-            });
-        }
-
-        function addTeaField(member) {
-            let listContainer = document.getElementById(`tea-list-${member}`);
-            let teaIndex = listContainer.children.length;
-            
-            let teaBox = document.createElement('div');
-            teaBox.className = 'tea-entry-box';
-            teaBox.innerHTML = `
-                ${teaIndex > 0 ? '<button type="button" class="btn-danger" onclick="this.parentElement.remove()">삭제</button>' : ''}
-                <div class="form-group" style="margin-bottom:8px;">
-                    <input type="text" class="form-control tea-name" placeholder="차 이름 (예: 대만 동정우롱)" required>
-                </div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <input type="text" class="form-control tea-type" placeholder="차 종류 (예: 우롱차)">
-                </div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <label style="font-size:0.75rem; margin-bottom:2px;">수색 선택</label>
-                    <div class="color-picker-group">
-                        ${COLOR_PALETTE.map((c, i) => `
-                            <div class="color-option ${i === 0 ? 'selected' : ''}" style="background-color: ${c};" onclick="selectColor(this, '${c}')"></div>
-                        `).join('')}
-                    </div>
-                    <input type="hidden" class="tea-color" value="${COLOR_PALETTE[0]}">
-                </div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <input type="text" class="form-control tea-tasting" placeholder="향과 맛 코멘트">
-                </div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <input type="text" class="form-control tea-snack" placeholder="다과 정보">
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                    <input type="text" class="form-control tea-memo" placeholder="개인 메모">
-                </div>
-            `;
-            listContainer.appendChild(teaBox);
-        }
-
-        function selectColor(el, color) {
-            let parent = el.parentElement;
-            parent.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
-            el.classList.add('selected');
-            parent.parentElement.querySelector('.tea-color').value = color;
-        }
-
-        function saveSession(event) {
-            event.preventDefault();
-
-            let sessionData = {
-                date: document.getElementById('mDate').value,
-                weather: document.getElementById('mWeather').value,
-                tName: document.getElementById('tName').value,
-                tRegion: document.getElementById('tRegion').value,
-                tTheme: document.getElementById('tTheme').value,
-                tManager: document.getElementById('tManager').value,
-                tDesc: document.getElementById('tDesc').value,
-                records: {}
-            };
-
-            MEMBERS.forEach(member => {
-                let listContainer = document.getElementById(`tea-list-${member}`);
-                let teaBoxes = listContainer.getElementsByClassName('tea-entry-box');
-                let memberTeas = [];
-
-                for(let box of teaBoxes) {
-                    memberTeas.push({
-                        name: box.querySelector('.tea-name').value,
-                        type: box.querySelector('.tea-type').value,
-                        color: box.querySelector('.tea-color').value,
-                        tasting: box.querySelector('.tea-tasting').value,
-                        snack: box.querySelector('.tea-snack').value,
-                        memo: box.querySelector('.tea-memo').value
-                    });
-                }
-                sessionData.records[member] = memberTeas;
-            });
-
-            sessions.unshift(sessionData);
-            localStorage.setItem('teakkk_sessions', JSON.stringify(sessions));
-
-            closeModal();
-            renderAll();
+        function saveToLocalStorage() {
+            localStorage.setItem('teakkk_gatherings_v2', JSON.stringify(gatherings));
         }
 
         function renderTracker() {
-            let grid = document.getElementById('cupsGrid');
+            const grid = document.getElementById('teacups-grid');
+            const countLabel = document.getElementById('tracker-count-label');
             grid.innerHTML = '';
-            let count = sessions.length;
+            
+            const totalCount = gatherings.length;
+            countLabel.textContent = `${totalCount} / 12 달성`;
 
-            for(let i = 0; i < 12; i++) {
-                let item = document.createElement('div');
-                item.className = `cup-item ${i < count ? 'filled' : ''}`;
-                item.innerHTML = `
-                    <svg viewBox="0 0 24 24"><path d="M2,21V19H20V21H2M20,8V5H18V8H20M20,3A2,2 0 0,1 22,5V8A2,2 0 0,1 20,10H18V13A4,4 0 0,1 14,17H8A4,4 0 0,1 4,13V3H20M16,13V5H6V13A2,2 0 0,0 8,15H14A2,2 0 0,0 16,13Z"/></svg>
+            for (let i = 0; i < 12; i++) {
+                const isFilled = i < totalCount;
+                const cupEl = document.createElement('div');
+                cupEl.className = `aspect-square rounded-xl border flex flex-col items-center justify-center transition-all ${
+                    isFilled 
+                        ? 'bg-[#F3C68F]/30 border-[#D8A462] shadow-xs transform scale-102' 
+                        : 'bg-white/50 border-[#E8E2D5] opacity-50'
+                }`;
+                
+                cupEl.innerHTML = `
+                    <span class="text-base">${isFilled ? '🍵' : '☕'}</span>
+                    <span class="text-[9px] font-semibold mt-0.5 ${isFilled ? 'text-[#79553D]' : 'text-[#A89F91]'}">#${i + 1}</span>
                 `;
-                grid.appendChild(item);
+                grid.appendChild(cupEl);
             }
         }
 
-        function renderHome() {
-            renderTracker();
-            let listEl = document.getElementById('sessionList');
-            listEl.innerHTML = '';
+        function openGatheringModal() {
+            document.getElementById('gathering-form').reset();
+            document.getElementById('g-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('gathering-modal').classList.remove('hidden');
+        }
 
-            if(sessions.length === 0) {
-                listEl.innerHTML = `<div class="empty-state">아직 기록된 찻자리가 없습니다.<br>첫 번째 모임을 기록해보세요!</div>`;
+        function closeGatheringModal() {
+            document.getElementById('gathering-modal').classList.add('hidden');
+        }
+
+        function saveGatheringCard(e) {
+            e.preventDefault();
+            const date = document.getElementById('g-date').value;
+            const weather = document.getElementById('g-weather').value;
+            const teahouse = document.getElementById('g-teahouse').value;
+            const region = document.getElementById('g-region').value;
+            const theme = document.getElementById('g-theme').value;
+            const manager = document.getElementById('g-manager').value;
+            const description = document.getElementById('g-description').value;
+
+            const newGathering = {
+                id: 'g_' + Date.now(),
+                date,
+                weather,
+                teahouse,
+                region,
+                theme,
+                manager,
+                description,
+                memberRecords: {}
+            };
+
+            gatherings.unshift(newGathering);
+            saveToLocalStorage();
+            renderTracker();
+            renderGatherings();
+            renderMemberSummaries();
+            closeGatheringModal();
+            showToast("찻자리 카드가 생성되었습니다 🍵");
+        }
+
+        function openRecordModal() {
+            if (gatherings.length === 0) {
+                showToast("먼저 등록된 찻자리 카드가 없습니다!");
                 return;
             }
 
-            sessions.forEach((s) => {
-                // 차 중심 그룹화 로직
-                let teaMap = {};
-                MEMBERS.forEach(member => {
-                    if(s.records[member]) {
-                        s.records[member].forEach(t => {
-                            if(!t.name) return;
-                            if(!teaMap[t.name]) {
-                                teaMap[t.name] = { type: t.type, colors: [], tastings: [] };
-                            }
-                            if(!teaMap[t.name].colors.includes(t.color)) {
-                                teaMap[t.name].colors.push(t.color);
-                            }
-                            teaMap[t.name].tastings.push({ member: member, tasting: t.tasting });
-                        });
-                    }
-                });
-
-                let teaGroupHTML = '';
-                for(let teaName in teaMap) {
-                    let info = teaMap[teaName];
-                    let dotsHTML = info.colors.map(c => `<div class="color-dot" style="background:${c};"></div>`).join('');
-                    let tastingsHTML = info.tastings.map(t => `
-                        <div class="member-tasting-row">
-                            <span class="member-tasting-name">${t.member}</span>
-                            <span>${t.tasting || '-'}</span>
-                        </div>
-                    `).join('');
-
-                    teaGroupHTML += `
-                        <div class="tea-group-item">
-                            <div class="tea-group-header">
-                                <div class="color-dots">${dotsHTML}</div>
-                                <div class="tea-group-name">${teaName}</div>
-                                ${info.type ? `<div class="tea-group-type">${info.type}</div>` : ''}
-                            </div>
-                            <div>${tastingsHTML}</div>
-                        </div>
-                    `;
-                }
-
-                let card = document.createElement('div');
-                card.className = 'session-card';
-                card.innerHTML = `
-                    <div class="session-header">
-                        <div>
-                            <div class="session-date-location">${s.date} ${s.weather ? '· ' + s.weather : ''} | ${s.tRegion || ''}</div>
-                            <div class="session-title">${s.tName}</div>
-                        </div>
-                        <div class="session-badge">${s.tManager} 담당</div>
-                    </div>
-                    ${s.tTheme ? `<div style="font-size:0.85rem; font-weight:600; color:var(--primary); margin-bottom:6px;">📌 ${s.tTheme}</div>` : ''}
-                    ${s.tDesc ? `<div class="session-desc">${s.tDesc}</div>` : ''}
-                    <div class="tea-group-list">
-                        ${teaGroupHTML || '<div style="font-size:0.8rem; color:#888;">기록된 차가 없습니다.</div>'}
-                    </div>
-                `;
-                listEl.appendChild(card);
+            const selectEl = document.getElementById('rec-gathering-id');
+            selectEl.innerHTML = '';
+            gatherings.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.id;
+                opt.textContent = `[${g.date}] ${g.teahouse} (${g.region})`;
+                selectEl.appendChild(opt);
             });
+
+            document.getElementById('modal-tea-items-container').innerHTML = '';
+            addModalTeaItem();
+            document.getElementById('record-modal').classList.remove('hidden');
         }
 
-        function renderLogs() {
-            let container = document.getElementById('logMemberList');
+        function closeRecordModal() {
+            document.getElementById('record-modal').classList.add('hidden');
+        }
+
+        function addModalTeaItem(data = {}) {
+            const container = document.getElementById('modal-tea-items-container');
+            const idx = container.children.length;
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = "bg-[#FBF9F5] p-3 rounded-lg border border-[#E3DFD5] space-y-2.5 relative";
+            
+            let typeOptions = TEA_TYPES.map(t => `<option value="${t}" ${data.type === t ? 'selected' : ''}>${t}</option>`).join('');
+            
+            let colorButtonsHTML = '';
+            LIQUOR_COLORS.forEach(c => {
+                const isSelected = (data.colorHex === c.hex) || (!data.colorHex && c.hex === "#F3C68F");
+                colorButtonsHTML += `
+                    <button type="button" 
+                        class="w-6 h-6 rounded-full border-2 transition transform hover:scale-110 color-btn ${isSelected ? 'ring-2 ring-[#79553D] scale-105' : ''}" 
+                        style="background-color: ${c.hex}; border-color: ${c.border};" 
+                        title="${c.name}"
+                        onclick="selectColor(this, '${c.hex}', '${c.name}')">
+                    </button>
+                `;
+            });
+
+            itemDiv.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-semibold text-[#8C8279] uppercase">차 항목 #${idx + 1}</span>
+                    ${idx > 0 ? `<button type="button" onclick="this.closest('.bg-\\[\\#FBF9F5\\]').remove()" class="text-xs text-red-400 hover:text-red-600"><i class="fa-solid fa-trash-can"></i> 삭제</button>` : ''}
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] text-[#685D54] mb-0.5">차 이름 *</label>
+                        <input type="text" name="tea-name" value="${data.name || ''}" placeholder="예: 동정우롱" required class="w-full text-xs px-2.5 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-[#685D54] mb-0.5">차 종류</label>
+                        <select name="tea-type" class="w-full text-xs px-2 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none">
+                            ${typeOptions}
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] text-[#685D54] mb-1">수색 (우린 색상 선택)</label>
+                    <div class="flex items-center space-x-2 bg-white p-2 rounded-md border border-[#E3DFD5]">
+                        <div class="flex items-center space-x-1.5 color-palette-container">
+                            ${colorButtonsHTML}
+                        </div>
+                        <input type="hidden" name="tea-color-hex" value="${data.colorHex || '#F3C68F'}">
+                        <input type="hidden" name="tea-color-name" value="${data.colorName || '따뜻한 호박색'}">
+                        <span class="text-[10px] text-[#736A61] font-medium selected-color-label">${data.colorName || '따뜻한 호박색'}</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] text-[#685D54] mb-0.5">향과 맛 *</label>
+                        <input type="text" name="tea-flavor" value="${data.flavor || ''}" placeholder="예: 곡물향, 꽃향" required class="w-full text-xs px-2.5 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-[#685D54] mb-0.5">함께 먹은 다과</label>
+                        <input type="text" name="tea-snack" value="${data.snack || ''}" placeholder="예: 말차 화과자" class="w-full text-xs px-2.5 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] text-[#685D54] mb-0.5">메모 (시음 소감)</label>
+                    <input type="text" name="tea-memo" value="${data.memo || ''}" placeholder="간단한 메모" class="w-full text-xs px-2.5 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none">
+                </div>
+            `;
+            container.appendChild(itemDiv);
+        }
+
+        function selectColor(btn, hex, name) {
+            const container = btn.closest('div').parentElement;
+            const parentPalette = btn.parentElement;
+            parentPalette.querySelectorAll('.color-btn').forEach(b => b.classList.remove('ring-2', 'ring-[#79553D]', 'scale-105'));
+            btn.classList.add('ring-2', 'ring-[#79553D]', 'scale-105');
+            
+            container.querySelector('[name="tea-color-hex"]').value = hex;
+            container.querySelector('[name="tea-color-name"]').value = name;
+            container.querySelector('.selected-color-label').textContent = name;
+        }
+
+        function saveMemberRecords(e) {
+            e.preventDefault();
+            const gatheringId = document.getElementById('rec-gathering-id').value;
+            const member = document.getElementById('rec-member').value;
+
+            const teaItems = document.querySelectorAll('#modal-tea-items-container > div');
+            const teas = [];
+            teaItems.forEach(item => {
+                const name = item.querySelector('[name="tea-name"]').value;
+                const type = item.querySelector('[name="tea-type"]').value;
+                const colorHex = item.querySelector('[name="tea-color-hex"]').value;
+                const colorName = item.querySelector('[name="tea-color-name"]').value;
+                const flavor = item.querySelector('[name="tea-flavor"]').value;
+                const snack = item.querySelector('[name="tea-snack"]').value;
+                const memo = item.querySelector('[name="tea-memo"]').value;
+
+                if (name.trim()) {
+                    teas.push({ name, type, colorHex, colorName, flavor, snack, memo });
+                }
+            });
+
+            if (teas.length === 0) {
+                showToast("최소 1개 이상의 차를 입력해주세요.");
+                return;
+            }
+
+            const gathering = gatherings.find(g => g.id === gatheringId);
+            if (gathering) {
+                if (!gathering.memberRecords) gathering.memberRecords = {};
+                gathering.memberRecords[member] = teas;
+                saveToLocalStorage();
+                renderGatherings();
+                renderMemberSummaries();
+                closeRecordModal();
+                showToast(`${member}님의 기록이 성공적으로 저장되었습니다 🍵`);
+            }
+        }
+
+        function deleteGathering(id) {
+            if (confirm("이 찻자리 카드와 모든 기록을 삭제하시겠습니까?")) {
+                gatherings = gatherings.filter(g => g.id !== id);
+                saveToLocalStorage();
+                renderTracker();
+                renderGatherings();
+                renderMemberSummaries();
+                showToast("삭제되었습니다.");
+            }
+        }
+
+        function toggleMemberExpand(member) {
+            memberExpandedState[member] = !memberExpandedState[member];
+            renderMemberSummaries();
+        }
+
+        function renderMemberSummaries() {
+            const container = document.getElementById('member-summary-cards');
             container.innerHTML = '';
 
             MEMBERS.forEach(member => {
-                let memberBox = document.createElement('div');
-                memberBox.className = 'log-member-section';
-                
-                let teasHTML = '';
-                sessions.forEach(s => {
-                    if(s.records[member]) {
-                        s.records[member].forEach(t => {
-                            if(!t.name) return;
-                            teasHTML += `
-                                <div class="log-tea-card">
-                                    <div class="log-tea-header">
-                                        <div style="display:flex; align-items:center; gap:6px;">
-                                            <div class="color-dot" style="background:${t.color};"></div>
-                                            <span class="log-tea-title">${t.name}</span>
-                                        </div>
-                                        <span style="font-size:0.75rem; color:var(--text-sub);">${s.date} (${s.tName})</span>
-                                    </div>
-                                    <div class="log-tea-details">
-                                        <div>종류: ${t.type || '-'}</div>
-                                        <div>향과 맛: ${t.tasting || '-'}</div>
-                                        <div>다과: ${t.snack || '-'}</div>
-                                        ${t.memo ? `<div style="margin-top:2px; color:var(--primary);">메모: ${t.memo}</div>` : ''}
-                                    </div>
-                                </div>
-                            `;
+                let allMemberTeas = [];
+                gatherings.forEach(g => {
+                    if (g.memberRecords && g.memberRecords[member]) {
+                        g.memberRecords[member].forEach(t => {
+                            allMemberTeas.push({ ...t, teahouse: g.teahouse, date: g.date });
                         });
                     }
                 });
 
-                memberBox.innerHTML = `
-                    <div class="log-member-name">🍵 ${member}의 찻자리 아카이브</div>
-                    ${teasHTML || '<div class="empty-state" style="padding:20px;">아직 기록된 차가 없습니다.</div>'}
+                const isExpanded = !!memberExpandedState[member];
+                const displayTeas = isExpanded ? allMemberTeas : allMemberTeas.slice(0, 3);
+                const hasMore = allMemberTeas.length > 3;
+
+                let teaItemsHTML = '';
+                if (allMemberTeas.length === 0) {
+                    teaItemsHTML = `<p class="text-[11px] text-[#A89F91] italic py-1">아직 기록된 차가 없습니다.</p>`;
+                } else {
+                    displayTeas.forEach(t => {
+                        teaItemsHTML += `
+                            <div class="bg-[#FBF9F5] p-2.5 rounded-lg border border-[#E3DFD5] space-y-1 text-xs">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full shadow-2xs" style="background-color: ${t.colorHex || '#F3C68F'};"></span>
+                                        <span class="font-semibold text-[#4E433C]">${t.name}</span>
+                                        <span class="text-[10px] text-[#8C8279] bg-white px-1.5 py-0.2 rounded border border-[#EFECE6]">${t.type}</span>
+                                    </div>
+                                    <span class="text-[10px] text-[#8C8279]">${t.teahouse}</span>
+                                </div>
+                                <div class="text-[11px] text-[#79553D] font-medium bg-white/70 px-2 py-1 rounded border border-[#F1EFE7]">
+                                    🌿 향과 맛: ${t.flavor}
+                                </div>
+                                ${t.snack ? `<div class="text-[10px] text-[#736A61]">🍡 다과: ${t.snack}</div>` : ''}
+                                ${t.memo ? `<div class="text-[10px] text-[#685D54] italic">💭 메모: ${t.memo}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                }
+
+                const card = document.createElement('div');
+                card.className = "bg-white border border-[#E8E2D5] rounded-xl p-3.5 shadow-xs space-y-2.5";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-[#F1EFE7] pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-full bg-[#79553D] text-white text-xs font-bold flex items-center justify-center">${member.slice(0, 1)}</span>
+                            <h4 class="font-serif-kr font-bold text-xs text-[#4E433C]">${member}의 마신 차 리스트</h4>
+                        </div>
+                        <span class="text-[10px] bg-[#F5F2EC] text-[#79553D] px-2 py-0.5 rounded-full font-semibold">총 ${allMemberTeas.length}잔</span>
+                    </div>
+                    <div class="space-y-2">
+                        ${teaItemsHTML}
+                    </div>
+                    ${hasMore ? `
+                        <button onclick="toggleMemberExpand('${member}')" class="w-full text-center text-[11px] text-[#79553D] font-medium py-1.5 bg-[#F5F2EC] hover:bg-[#EAE4D8] rounded-md transition mt-1">
+                            ${isExpanded ? '접기 ∧' : `+ 더보기 (전체 ${allMemberTeas.length}개 보기) ∨`}
+                        </button>
+                    ` : ''}
                 `;
-                container.appendChild(memberBox);
+                container.appendChild(card);
             });
         }
 
-        function renderAll() {
-            renderHome();
-            renderLogs();
-        }
+        function renderGatherings() {
+            const container = document.getElementById('gatherings-container');
+            const emptyState = document.getElementById('empty-state');
+            const countLabel = document.getElementById('gathering-count');
 
-        // 초기 실행
-        renderAll();
+            countLabel.textContent = `총 ${gatherings.length}개`;
+
+            if (gatherings.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = '';
+
+            gatherings.forEach(g => {
+                const card = document.createElement('div');
+                card.className = "bg-white border border-[#E8E2D5] rounded-2xl shadow-xs overflow-hidden transition hover:shadow-md";
+
+                const formattedDate = g.date.replace(/-/g, '. ');
+
+                const teaMap = {}; 
+                if (g.memberRecords) {
+                    Object.keys(g.memberRecords).forEach(member => {
+                        const teas = g.memberRecords[member];
+                        if (teas) {
+                            teas.forEach(t => {
+                                if (!teaMap[t.name]) {
+                                    teaMap[t.name] = {
+                                        type: t.type,
+                                        entries: [],
+                                        colors: new Set()
+                                    };
+                                }
+                                teaMap[t.name].entries.push({ member, flavor: t.flavor, colorHex: t.colorHex || '#F3C68F' });
+                                if (t.colorHex) {
+                                    teaMap[t.name].colors.add(t.colorHex);
+                                }
+                            });
+                        }
+                    });
+                }
+
+                let teaGroupsHTML = '';
+                const teaKeys = Object.keys(teaMap);
+                
+                if (teaKeys.length === 0) {
+                    teaGroupsHTML = `<p class="text-[11px] text-[#A89F91] italic py-1 text-center">아직 등록된 개인 기록이 없어요. 우상단 '기록하기'를 눌러보세요!</p>`;
+                } else {
+                    teaKeys.forEach(teaName => {
+                        const teaInfo = teaMap[teaName];
+                        let colorCirclesHTML = '';
+                        teaInfo.colors.forEach(hex => {
+                            colorCirclesHTML += `<span class="w-3 h-3 rounded-full border border-black/10 inline-block shadow-2xs" style="background-color: ${hex};" title="수색"></span>`;
+                        });
+
+                        let memberLinesHTML = '';
+                        teaInfo.entries.forEach(entry => {
+                            memberLinesHTML += `
+                                <div class="text-xs text-[#5C524B] flex items-start space-x-1.5 py-0.5">
+                                    <span class="font-bold text-[#79553D] shrink-0">[${entry.member}]</span>
+                                    <span class="text-[#685D54]">향과 맛: ${entry.flavor}</span>
+                                </div>
+                            `;
+                        });
+
+                        teaGroupsHTML += `
+                            <div class="bg-[#FBF9F5] p-3 rounded-xl border border-[#E3DFD5] space-y-2">
+                                <div class="flex items-center justify-between border-b border-[#F1EFE7] pb-1.5">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="flex items-center space-x-1">
+                                            ${colorCirclesHTML}
+                                        </div>
+                                        <span class="font-serif-kr font-bold text-xs text-[#3C3633]">${teaName}</span>
+                                        <span class="text-[10px] text-[#8C8279] bg-white px-1.5 py-0.2 rounded border border-[#EFECE6]">${teaInfo.type}</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-1 pl-1">
+                                    ${memberLinesHTML}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                card.innerHTML = `
+                    <div class="bg-[#F5F2EC] px-4 py-3 border-b border-[#E8E2D5]">
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-center space-x-1.5">
+                                <span class="text-[11px] font-semibold text-[#79553D] bg-white px-2 py-0.5 rounded border border-[#E3DFD5]">${formattedDate}</span>
+                                <span class="text-[11px] text-[#736A61]">${g.weather || ''}</span>
+                                <span class="text-[11px] text-[#736A61] bg-white/60 px-1.5 py-0.5 rounded">📍 ${g.region}</span>
+                            </div>
+                            <button onclick="deleteGathering('${g.id}')" class="text-xs text-[#A89F91] hover:text-red-500 p-1 transition" title="기록 삭제">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between mt-1">
+                            <h3 class="font-serif-kr font-bold text-base text-[#3C3633] flex items-center space-x-1.5">
+                                <i class="fa-solid fa-mug-hot text-[#79553D] text-sm"></i>
+                                <span>${g.teahouse}</span>
+                            </h3>
+                            ${g.theme ? `<span class="text-[11px] font-medium text-[#5C524B] bg-[#EFECE6] px-2 py-0.5 rounded-full"># ${g.theme}</span>` : ''}
+                        </div>
+                        ${g.description ? `
+                            <p class="text-xs text-[#685D54] mt-2 bg-white/80 p-2 rounded-lg border border-[#E8E2D5] italic">
+                                💡 ${g.description}
+                            </p>
+                        ` : ''}
+                        <div class="text-[10px] text-[#8C8279] mt-2">
+                            담당자: ${g.manager || '경민'}
+                        </div>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <div class="space-y-2.5">
+                            ${teaGroupsHTML}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
     </script>
 </body>
 </html>
