@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>티크크 - 우리의 찻자리 기록장</title>
+    <style>
+        :root {
+            --primary: #8C6D53;
+            --primary-light: #F4EFEA;
+            --accent: #D9886A;
+            --bg: #FAFAF7;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --text-sub: #777777;
+            --border: #E5E0DA;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding-bottom: 90px;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 18px 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* 탭 콘텐츠 */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 12잔 트래커 */
+        .tracker-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .tracker-title {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .cups-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            justify-items: center;
+        }
+
+        .cup-item {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .cup-item.filled {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 2px 6px rgba(140, 109, 83, 0.3);
+        }
+
+        .cup-item svg {
+            width: 20px;
+            height: 20px;
+            fill: #C4B5A5;
+        }
+
+        .cup-item.filled svg {
+            fill: #FFFFFF;
+        }
+
+        /* 버튼 스타일 */
+        .btn-primary {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(140, 109, 83, 0.2);
+            transition: background 0.2s;
+        }
+
+        .btn-primary:active {
+            background-color: #73553e;
+        }
+
+        /* 찻자리 카드 목록 */
+        .session-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--primary-light);
+        }
+
+        .session-date-location {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+        }
+
+        .session-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .session-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .session-desc {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+
+        /* 차 중심 리스트 스타일 */
+        .tea-group-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tea-group-item {
+            background: #FCFCFA;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .tea-group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .color-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .color-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .tea-group-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .tea-group-type {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            background: #EFECE6;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .member-tasting-row {
+            font-size: 0.85rem;
+            padding: 4px 0 4px 10px;
+            border-left: 2px solid var(--accent);
+            margin-top: 4px;
+            display: flex;
+            gap: 8px;
+            color: #555;
+        }
+
+        .member-tasting-name {
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 35px;
+        }
+
+        /* 로그 탭 스타일 */
+        .log-member-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .log-member-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .log-tea-card {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .log-tea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .log-tea-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .log-tea-details {
+            font-size: 0.82rem;
+            color: var(--text-sub);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        /* 하단 네비게이션 탭 */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.8rem;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 1.15rem;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-sub);
+        }
+
+        /* 폼 요소 스타일 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: var(--bg);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .member-section-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .member-section-title {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .tea-entry-box {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .btn-sub {
+            background: #EFECE6;
+            color: var(--text-main);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        .btn-danger {
+            background: #FFEBEB;
+            color: #D9534F;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            float: right;
+        }
+
+        /* 컬러 팔레트 선택 */
+        .color-picker-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .color-option {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .color-option.selected {
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>티크크 (Teakkk)</h1>
+    </header>
+
+    <div class="container">
+        <!-- 홈 탭 -->
+        <div id="tab-home" class="tab-content active">
+            <!-- 12잔 트래커 -->
+            <div class="tracker-card">
+                <div class="tracker-title">우리의 찻자리 여정</div>
+                <div class="cups-grid" id="cupsGrid">
+                    <!-- 자바스크립트로 생성 -->
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="openModal()">+ 찻자리 기록하기</button>
+
+            <!-- 찻자리 카드 목록 -->
+            <div id="sessionList">
+                <!-- 자바스크립트로 생성 -->
+            </div>
+        </div>
+
+        <!-- 로그 탭 -->
+        <div id="tab-log" class="tab-content">
+            <div id="logMemberList">
+                <!-- 자바스크립트로 생성 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 하단 네비게이션 -->
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchTab('home')">홈</div>
+        <div class="nav-item" onclick="switchTab('log')">로그</div>
+    </div>
+
+    <!-- 기록하기 모달 -->
+    <div class="modal" id="recordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>찻자리 기록하기</h2>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <form id="recordForm" onsubmit="saveSession(event)">
+                <div class="form-group">
+                    <label>모임 날짜</label>
+                    <input type="date" id="mDate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>날씨</label>
+                    <input type="text" id="mWeather" class="form-control" placeholder="예: 맑음, 비 옴, 선선함">
+                </div>
+                <div class="form-group">
+                    <label>티하우스 이름</label>
+                    <input type="text" id="tName" class="form-control" placeholder="예: 퀠리테, 절로 등" required>
+                </div>
+                <div class="form-group">
+                    <label>티하우스 지역</label>
+                    <input type="text" id="tRegion" class="form-control" placeholder="예: 서울 종로구, 연남동">
+                </div>
+                <div class="form-group">
+                    <label>이번 달 주제</label>
+                    <input type="text" id="tTheme" class="form-control" placeholder="예: 대만 우롱차 탐방">
+                </div>
+                <div class="form-group">
+                    <label>담당자</label>
+                    <select id="tManager" class="form-control">
+                        <option value="경민">경민</option>
+                        <option value="다인">다인</option>
+                        <option value="다은">다은</option>
+                        <option value="보현">보현</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>티하우스 / 찻집 설명</label>
+                    <textarea id="tDesc" class="form-control" rows="2" placeholder="예: 00찻집은 센차와 화과자가 유명한 곳"></textarea>
+                </div>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
+
+                <div class="form-group">
+                    <label style="font-size: 1rem; color: var(--primary);">티크크 기록장 (멤버별 마신 차)</label>
+                    <div id="memberInputsContainer">
+                        <!-- 멤버별 입력폼 동적 생성 -->
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" style="margin-top: 20px;">저장하기</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const MEMBERS = ['경민', '다인', '다은', '보현'];
+        const COLOR_PALETTE = [
+            '#FCE4EC', '#F8BBD0', '#FFF3E0', '#FFE0B2', 
+            '#E8F5E9', '#C8E6C9', '#E0F7FA', '#B2EBF2', '#EFEBE9'
+        ];
+
+        let sessions = JSON.parse(localStorage.getItem('teakkk_sessions')) || [];
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            if(tabName === 'home') {
+                document.getElementById('tab-home').classList.add('active');
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            } else {
+                document.getElementById('tab-log').classList.add('active');
+                document.querySelectorAll('.nav-item')[1].classList.add('active');
+                renderLogs();
+            }
+        }
+
+        function openModal() {
+            document.getElementById('recordModal').classList.add('active');
+            document.getElementById('mDate').valueAsDate = new Date();
+            initMemberInputs();
+        }
+
+        function closeModal() {
+            document.getElementById('recordModal').classList.remove('active');
+        }
+
+        function initMemberInputs() {
+            const container = document.getElementById('memberInputsContainer');
+            container.innerHTML = '';
+
+            MEMBERS.forEach(member => {
+                let box = document.createElement('div');
+                box.className = 'member-section-box';
+                box.innerHTML = `
+                    <div class="member-section-title">${member}</div>
+                    <div id="tea-list-${member}"></div>
+                    <button type="button" class="btn-sub" onclick="addTeaField('${member}')">+ 차 추가하기</button>
+                `;
+                container.appendChild(box);
+                addTeaField(member);
+            });
+        }
+
+        function addTeaField(member) {
+            let listContainer = document.getElementById(`tea-list-${member}`);
+            let teaIndex = listContainer.children.length;
+            
+            let teaBox = document.createElement('div');
+            teaBox.className = 'tea-entry-box';
+            teaBox.innerHTML = `
+                ${teaIndex > 0 ? '<button type="button" class="btn-danger" onclick="this.parentElement.remove()">삭제</button>' : ''}
+                <div class="form-group" style="margin-bottom:8px;">
+                    <input type="text" class="form-control tea-name" placeholder="차 이름 (예: 대만 동정우롱)" required>
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <input type="text" class="form-control tea-type" placeholder="차 종류 (예: 우롱차)">
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <label style="font-size:0.75rem; margin-bottom:2px;">수색 선택</label>
+                    <div class="color-picker-group">
+                        ${COLOR_PALETTE.map((c, i) => `
+                            <div class="color-option ${i === 0 ? 'selected' : ''}" style="background-color: ${c};" onclick="selectColor(this, '${c}')"></div>
+                        `).join('')}
+                    </div>
+                    <input type="hidden" class="tea-color" value="${COLOR_PALETTE[0]}">
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <input type="text" class="form-control tea-tasting" placeholder="향과 맛 코멘트">
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <input type="text" class="form-control tea-snack" placeholder="다과 정보">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <input type="text" class="form-control tea-memo" placeholder="개인 메모">
+                </div>
+            `;
+            listContainer.appendChild(teaBox);
+        }
+
+        function selectColor(el, color) {
+            let parent = el.parentElement;
+            parent.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            parent.parentElement.querySelector('.tea-color').value = color;
+        }
+
+        function saveSession(event) {
+            event.preventDefault();
+
+            let sessionData = {
+                date: document.getElementById('mDate').value,
+                weather: document.getElementById('mWeather').value,
+                tName: document.getElementById('tName').value,
+                tRegion: document.getElementById('tRegion').value,
+                tTheme: document.getElementById('tTheme').value,
+                tManager: document.getElementById('tManager').value,
+                tDesc: document.getElementById('tDesc').value,
+                records: {}
+            };
+
+            MEMBERS.forEach(member => {
+                let listContainer = document.getElementById(`tea-list-${member}`);
+                let teaBoxes = listContainer.getElementsByClassName('tea-entry-box');
+                let memberTeas = [];
+
+                for(let box of teaBoxes) {
+                    memberTeas.push({
+                        name: box.querySelector('.tea-name').value,
+                        type: box.querySelector('.tea-type').value,
+                        color: box.querySelector('.tea-color').value,
+                        tasting: box.querySelector('.tea-tasting').value,
+                        snack: box.querySelector('.tea-snack').value,
+                        memo: box.querySelector('.tea-memo').value
+                    });
+                }
+                sessionData.records[member] = memberTeas;
+            });
+
+            sessions.unshift(sessionData);
+            localStorage.setItem('teakkk_sessions', JSON.stringify(sessions));
+
+            closeModal();
+            renderAll();
+        }
+
+        function renderTracker() {
+            let grid = document.getElementById('cupsGrid');
+            grid.innerHTML = '';
+            let count = sessions.length;
+
+            for(let i = 0; i < 12; i++) {
+                let item = document.createElement('div');
+                item.className = `cup-item ${i < count ? 'filled' : ''}`;
+                item.innerHTML = `
+                    <svg viewBox="0 0 24 24"><path d="M2,21V19H20V21H2M20,8V5H18V8H20M20,3A2,2 0 0,1 22,5V8A2,2 0 0,1 20,10H18V13A4,4 0 0,1 14,17H8A4,4 0 0,1 4,13V3H20M16,13V5H6V13A2,2 0 0,0 8,15H14A2,2 0 0,0 16,13Z"/></svg>
+                `;
+                grid.appendChild(item);
+            }
+        }
+
+        function renderHome() {
+            renderTracker();
+            let listEl = document.getElementById('sessionList');
+            listEl.innerHTML = '';
+
+            if(sessions.length === 0) {
+                listEl.innerHTML = `<div class="empty-state">아직 기록된 찻자리가 없습니다.<br>첫 번째 모임을 기록해보세요!</div>`;
+                return;
+            }
+
+            sessions.forEach((s) => {
+                // 차 중심 그룹화 로직
+                let teaMap = {};
+                MEMBERS.forEach(member => {
+                    if(s.records[member]) {
+                        s.records[member].forEach(t => {
+                            if(!t.name) return;
+                            if(!teaMap[t.name]) {
+                                teaMap[t.name] = { type: t.type, colors: [], tastings: [] };
+                            }
+                            if(!teaMap[t.name].colors.includes(t.color)) {
+                                teaMap[t.name].colors.push(t.color);
+                            }
+                            teaMap[t.name].tastings.push({ member: member, tasting: t.tasting });
+                        });
+                    }
+                });
+
+                let teaGroupHTML = '';
+                for(let teaName in teaMap) {
+                    let info = teaMap[teaName];
+                    let dotsHTML = info.colors.map(c => `<div class="color-dot" style="background:${c};"></div>`).join('');
+                    let tastingsHTML = info.tastings.map(t => `
+                        <div class="member-tasting-row">
+                            <span class="member-tasting-name">${t.member}</span>
+                            <span>${t.tasting || '-'}</span>
+                        </div>
+                    `).join('');
+
+                    teaGroupHTML += `
+                        <div class="tea-group-item">
+                            <div class="tea-group-header">
+                                <div class="color-dots">${dotsHTML}</div>
+                                <div class="tea-group-name">${teaName}</div>
+                                ${info.type ? `<div class="tea-group-type">${info.type}</div>` : ''}
+                            </div>
+                            <div>${tastingsHTML}</div>
+                        </div>
+                    `;
+                }
+
+                let card = document.createElement('div');
+                card.className = 'session-card';
+                card.innerHTML = `
+                    <div class="session-header">
+                        <div>
+                            <div class="session-date-location">${s.date} ${s.weather ? '· ' + s.weather : ''} | ${s.tRegion || ''}</div>
+                            <div class="session-title">${s.tName}</div>
+                        </div>
+                        <div class="session-badge">${s.tManager} 담당</div>
+                    </div>
+                    ${s.tTheme ? `<div style="font-size:0.85rem; font-weight:600; color:var(--primary); margin-bottom:6px;">📌 ${s.tTheme}</div>` : ''}
+                    ${s.tDesc ? `<div class="session-desc">${s.tDesc}</div>` : ''}
+                    <div class="tea-group-list">
+                        ${teaGroupHTML || '<div style="font-size:0.8rem; color:#888;">기록된 차가 없습니다.</div>'}
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        function renderLogs() {
+            let container = document.getElementById('logMemberList');
+            container.innerHTML = '';
+
+            MEMBERS.forEach(member => {
+                let memberBox = document.createElement('div');
+                memberBox.className = 'log-member-section';
+                
+                let teasHTML = '';
+                sessions.forEach(s => {
+                    if(s.records[member]) {
+                        s.records[member].forEach(t => {
+                            if(!t.name) return;
+                            teasHTML += `
+                                <div class="log-tea-card">
+                                    <div class="log-tea-header">
+                                        <div style="display:flex; align-items:center; gap:6px;">
+                                            <div class="color-dot" style="background:${t.color};"></div>
+                                            <span class="log-tea-title">${t.name}</span>
+                                        </div>
+                                        <span style="font-size:0.75rem; color:var(--text-sub);">${s.date} (${s.tName})</span>
+                                    </div>
+                                    <div class="log-tea-details">
+                                        <div>종류: ${t.type || '-'}</div>
+                                        <div>향과 맛: ${t.tasting || '-'}</div>
+                                        <div>다과: ${t.snack || '-'}</div>
+                                        ${t.memo ? `<div style="margin-top:2px; color:var(--primary);">메모: ${t.memo}</div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+
+                memberBox.innerHTML = `
+                    <div class="log-member-name">🍵 ${member}의 찻자리 아카이브</div>
+                    ${teasHTML || '<div class="empty-state" style="padding:20px;">아직 기록된 차가 없습니다.</div>'}
+                `;
+                container.appendChild(memberBox);
+            });
+        }
+
+        function renderAll() {
+            renderHome();
+            renderLogs();
+        }
+
+        // 초기 실행
+        renderAll();
+    </script>
+</body>
+</html>
