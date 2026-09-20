@@ -37,8 +37,6 @@
         .flex { display: flex; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
-        .justify-around { justify-content: space-around; }
-        .space-x-2 > * + * { margin-left: 8px; }
         .space-y-4 > * + * { margin-top: 16px; }
         
         .btn {
@@ -129,7 +127,6 @@
             outline: none; margin-top: 4px;
         }
         .form-label { font-size: 11px; font-weight: 500; color: #685D54; display: block; }
-        
         .hidden { display: none !important; }
         
         #toast {
@@ -167,10 +164,8 @@
 
     <!-- Main Container -->
     <main class="container space-y-4">
-        
         <!-- Home Tab -->
         <div id="tab-home" class="space-y-4">
-            <!-- Tracker Section -->
             <section class="card-sub">
                 <div class="flex items-center justify-between" style="margin-bottom: 8px;">
                     <h3 style="font-size: 12px; font-weight: 600; color: #79553D; text-transform: uppercase;">찻잔 달력</h3>
@@ -180,7 +175,6 @@
                 <div id="teacups-grid" class="grid-6"></div>
             </section>
 
-            <!-- Gathering List Section -->
             <div style="display: flex; flex-direction: column; gap: 12px;">
                 <div class="flex items-center justify-between" style="padding: 0 4px;">
                     <h3 style="font-size: 12px; font-weight: 600; color: #79553D; text-transform: uppercase;">찻자리 카드 목록</h3>
@@ -205,7 +199,6 @@
             <p style="font-size: 15px; color: #5C524B; font-weight: bold; margin-bottom: 4px;">아직 등록된 찻자리가 없어요</p>
             <p style="font-size: 12px; color: #8C8279;">상단 '카드 등록' 버튼을 눌러 모임을 먼저 생성해보세요!</p>
         </div>
-
     </main>
 
     <!-- Navigation Bar -->
@@ -222,12 +215,12 @@
         </div>
     </nav>
 
-    <!-- Modal 1: Gathering -->
+    <!-- Modal 1: Gathering (닫기 버튼 위치 고정 수정 완료) -->
     <div id="gathering-modal" class="modal-bg hidden">
         <div class="modal-content">
-            <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: background: #F5F2EC;">
+            <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: space-between; background: #F5F2EC;">
                 <h3 style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 카드 등록하기</h3>
-                <button onclick="closeGatheringModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61;"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeGatheringModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61; padding: 4px;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="padding: 20px; overflow-y: auto;">
                 <form id="gathering-form" onsubmit="saveGatheringCard(event)" style="display: flex; flex-direction: column; gap: 12px;">
@@ -287,9 +280,9 @@
     <!-- Modal 2: Record -->
     <div id="record-modal" class="modal-bg hidden">
         <div class="modal-content">
-            <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: space-between;">
+            <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: space-between; background: #F5F2EC;">
                 <h3 style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 기록 남기기</h3>
-                <button onclick="closeRecordModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61;"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeRecordModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61; padding: 4px;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="padding: 20px; overflow-y: auto;">
                 <form id="record-form" onsubmit="saveMemberRecords(event)" style="display: flex; flex-direction: column; gap: 12px;">
@@ -569,9 +562,9 @@
             const member = document.getElementById('rec-member').value;
 
             const teaItems = document.querySelectorAll('#modal-tea-items-container > div');
-            const teas = [];
+            const newTeas = [];
             teaItems.forEach(item => {
-                teas.push({
+                newTeas.push({
                     name: item.querySelector('[name="tea-name"]').value,
                     type: item.querySelector('[name="tea-type"]').value,
                     colorHex: item.querySelector('[name="tea-color-hex"]').value,
@@ -590,14 +583,19 @@
                 const gathering = currentGatherings.find(g => g.id === gatheringId);
                 if (gathering) {
                     if (!gathering.memberRecords) gathering.memberRecords = {};
-                    gathering.memberRecords[member] = teas;
+                    
+                    // 기존 기록이 배열 형태가 아니거나 없으면 초기화 후 누적, 이미 있으면 기존 기록에 새로운 차 항목을 이어붙임(push)
+                    if (!Array.isArray(gathering.memberRecords[member])) {
+                        gathering.memberRecords[member] = [];
+                    }
+                    gathering.memberRecords[member].push(...newTeas);
 
                     gatherings = currentGatherings;
                     await sendToSheet('gathering_update', gatherings);
                     
                     renderTracker(); renderGatherings(); renderMemberSummaries();
                     closeRecordModal();
-                    showToast(`${member}님 기록 저장 완료 🍵`);
+                    showToast(`${member}님 기록 추가 완료 🍵`);
                 }
             } catch (err) {
                 showToast("저장 중 오류 발생");
@@ -626,7 +624,9 @@
                 let allTeas = [];
                 gatherings.forEach(g => {
                     if (g.memberRecords && g.memberRecords[member]) {
-                        g.memberRecords[member].forEach(t => allTeas.push({ ...t, teahouse: g.teahouse }));
+                        // memberRecords[member]가 배열인 경우 모두 추출
+                        const records = Array.isArray(g.memberRecords[member]) ? g.memberRecords[member] : [g.memberRecords[member]];
+                        records.forEach(t => allTeas.push({ ...t, teahouse: g.teahouse }));
                     }
                 });
 
@@ -695,7 +695,8 @@
                 if (g.memberRecords) {
                     Object.keys(g.memberRecords).forEach(member => {
                         if (g.memberRecords[member]) {
-                            g.memberRecords[member].forEach(t => {
+                            const records = Array.isArray(g.memberRecords[member]) ? g.memberRecords[member] : [g.memberRecords[member]];
+                            records.forEach(t => {
                                 if (!teaMap[t.name]) teaMap[t.name] = { type: t.type, entries: [], colors: new Set() };
                                 teaMap[t.name].entries.push({ member, flavor: t.flavor });
                                 if (t.colorHex) teaMap[t.name].colors.add(t.colorHex);
