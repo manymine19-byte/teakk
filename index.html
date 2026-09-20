@@ -4,52 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>티크크 - 찻자리 기록장</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://tailwindcss.com"></script>
     <!-- Pretendard Font CDN -->
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <!-- FontAwesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
             background-color: #FBF9F5;
             color: #3C3633;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .font-serif-kr {
-            font-family: "Pretendard Variable", Pretendard, sans-serif;
+        header {
+            background-color: #EFECE6;
+            border-bottom: 1px solid #E3DFD5;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            padding: 12px 16px;
         }
-        ::-webkit-scrollbar {
-            width: 4px;
+        .container {
+            max-width: 440px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 16px;
+            padding-bottom: 100px;
+            flex: 1;
         }
-        ::-webkit-scrollbar-track {
-            background: #F1EFE7;
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-around { justify-content: space-around; }
+        .space-x-2 > * + * { margin-left: 8px; }
+        .space-y-4 > * + * { margin-top: 16px; }
+        
+        .btn {
+            border: none;
+            cursor: pointer;
+            border-radius: 9999px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #D8D2C4;
-            border-radius: 2px;
+        .btn-primary { background-color: #79553D; color: white; }
+        .btn-primary:hover { background-color: #624430; }
+        .btn-secondary { background-color: #EAE4D8; color: #5C524B; }
+        .btn-secondary:hover { background-color: #DED7C8; }
+
+        .card {
+            background: white;
+            border: 1px solid #E8E2D5;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            margin-bottom: 16px;
         }
+        .card-sub {
+            background: #F5F2EC;
+            border: 1px solid #E8E2D5;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .grid-6 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+        .teacup-box {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 1px solid #E8E2D5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.5);
+        }
+        .teacup-box.filled {
+            background: rgba(243, 198, 143, 0.3);
+            border-color: #D8A462;
+        }
+
+        nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #FBF9F5;
+            border-top: 1px solid #E3DFD5;
+            padding: 10px 24px;
+            z-index: 10;
+        }
+        nav button {
+            background: none; border: none; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            font-size: 11px; color: #A89F91; font-weight: 500;
+        }
+        nav button.active { color: #79553D; }
+
+        .modal-bg {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+            z-index: 50; display: flex; align-items: flex-end; justify-content: center;
+        }
+        .modal-content {
+            background: #FBF9F5; width: 100%; max-width: 500px;
+            max-height: 90vh; border-radius: 24px 24px 0 0; overflow-y: auto;
+            display: flex; flex-direction: column;
+        }
+        @media (min-width: 640px) {
+            .modal-bg { align-items: center; padding: 16px; }
+            .modal-content { border-radius: 16px; }
+        }
+
+        .form-input, .form-select {
+            width: 100%; font-size: 12px; padding: 8px 12px;
+            background: white; border: 1px solid #E3DFD5; border-radius: 8px;
+            outline: none; margin-top: 4px;
+        }
+        .form-label { font-size: 11px; font-weight: 500; color: #685D54; display: block; }
+        
+        .hidden { display: none !important; }
+        
+        #toast {
+            position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+            background: #3C3633; color: white; font-size: 12px; padding: 10px 16px;
+            border-radius: 9999px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 60;
+        }
+        #toast.show { opacity: 1; }
     </style>
 </head>
-<body class="bg-[#FBF9F5] text-[#3C3633] min-h-screen flex flex-col antialiased">
+<body>
 
     <!-- Header -->
-    <header class="bg-[#EFECE6] border-b border-[#E3DFD5] sticky top-0 z-20 px-4 py-3.5 shadow-xs">
-        <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <span class="text-xl">🍵</span>
+    <header>
+        <div class="container" style="padding:0; margin:0 auto; display:flex; justify-content:space-between; align-items:center; max-width:440px;">
+            <div class="flex items-center" style="gap: 8px;">
+                <span style="font-size: 20px;">🍵</span>
                 <div>
-                    <h1 class="font-serif-kr font-bold text-base text-[#5C524B] leading-tight">티크크</h1>
-                    <p class="text-[10px] text-[#8C8279]">함께 마신 차를 기록해요</p>
+                    <h1 style="font-size: 15px; font-weight: bold; color: #5C524B; line-height: 1.2;">티크크</h1>
+                    <p style="font-size: 10px; color: #8C8279;">함께 마신 차를 기록해요</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="openGatheringModal()" class="bg-[#EAE4D8] text-[#5C524B] text-xs font-medium px-3 py-2 rounded-full shadow-2xs hover:bg-[#DED7C8] transition flex items-center space-x-1">
-                    <i class="fa-solid fa-calendar-plus text-[10px]"></i>
-                    <span>찻자리 카드 등록</span>
+            <div class="flex items-center" style="gap: 6px;">
+                <button onclick="openGatheringModal()" class="btn btn-secondary">
+                    <i class="fa-solid fa-calendar-plus" style="font-size: 10px;"></i>
+                    <span>카드 등록</span>
                 </button>
-                <button onclick="openRecordModal()" class="bg-[#79553D] text-white text-xs font-medium px-3 py-2 rounded-full shadow hover:bg-[#624430] transition flex items-center space-x-1">
-                    <i class="fa-solid fa-plus text-[10px]"></i>
+                <button onclick="openRecordModal()" class="btn btn-primary">
+                    <i class="fa-solid fa-plus" style="font-size: 10px;"></i>
                     <span>기록하기</span>
                 </button>
             </div>
@@ -57,93 +166,79 @@
     </header>
 
     <!-- Main Container -->
-    <main class="flex-1 max-w-md w-full mx-auto p-4 pb-24 space-y-5">
+    <main class="container space-y-4">
         
-        <!-- Tab Content: 홈 (Home) -->
-        <div id="tab-home" class="space-y-5 tab-content">
-            <!-- 1. Top 12 Teacups Tracker Section -->
-            <section class="bg-[#F5F2EC] border border-[#E8E2D5] rounded-2xl p-4 shadow-xs">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-serif-kr font-semibold text-xs text-[#79553D] uppercase tracking-wider">찻잔 달력</h3>
-                    <span id="tracker-count-label" class="text-[10px] text-[#8C8279]">0 / 12</span>
+        <!-- Home Tab -->
+        <div id="tab-home" class="space-y-4">
+            <!-- Tracker Section -->
+            <section class="card-sub">
+                <div class="flex items-center justify-between" style="margin-bottom: 8px;">
+                    <h3 style="font-size: 12px; font-weight: 600; color: #79553D; text-transform: uppercase;">찻잔 달력</h3>
+                    <span id="tracker-count-label" style="font-size: 10px; color: #8C8279;">0 / 12</span>
                 </div>
-                <p class="text-[11px] text-[#736A61] mb-3">찻자리 카드 등록하고 달력 채우기 도전</p>
-                
-                <!-- 12 Teacups Grid -->
-                <div id="teacups-grid" class="grid grid-cols-6 gap-2.5 pt-1">
-                    <!-- Dynamically rendered 12 teacups -->
-                </div>
+                <p style="font-size: 11px; color: #736A61; margin-bottom: 12px;">찻자리 카드 등록하고 달력 채우기 도전</p>
+                <div id="teacups-grid" class="grid-6"></div>
             </section>
 
-            <!-- 2. Entire Gathering Records List (찻자리 카드 기록) -->
-            <div class="space-y-3 pt-1">
-                <div class="flex items-center justify-between px-1">
-                    <h3 class="font-serif-kr font-semibold text-xs text-[#79553D] uppercase tracking-wider">찻자리 카드 목록</h3>
-                    <span id="gathering-count" class="text-[10px] text-[#8C8279]">총 0개</span>
+            <!-- Gathering List Section -->
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="flex items-center justify-between" style="padding: 0 4px;">
+                    <h3 style="font-size: 12px; font-weight: 600; color: #79553D; text-transform: uppercase;">찻자리 카드 목록</h3>
+                    <span id="gathering-count" style="font-size: 10px; color: #8C8279;">총 0개</span>
                 </div>
-
-                <div id="gatherings-container" class="space-y-4">
-                    <!-- Dynamically Rendered Gathering Cards -->
-                </div>
+                <div id="gatherings-container" style="display: flex; flex-direction: column; gap: 16px;"></div>
             </div>
         </div>
 
-        <!-- Tab Content: 로그 (Log / Members Tea Archive) -->
-        <div id="tab-log" class="space-y-4 tab-content hidden">
-            <div class="bg-[#F5F2EC] border border-[#E8E2D5] rounded-2xl p-4 shadow-xs text-center">
-                <h2 class="font-serif-kr font-semibold text-sm text-[#4E433C]">찻자리 아카이빙</h2>
-                <p class="text-xs text-[#736A61] mt-1">각자 기록한 찻자리 노트를 볼 수 있어요</p>
+        <!-- Log Tab -->
+        <div id="tab-log" class="space-y-4 hidden">
+            <div class="card-sub" style="text-align: center;">
+                <h2 style="font-size: 14px; font-weight: 600; color: #4E433C;">찻자리 아카이빙</h2>
+                <p style="font-size: 12px; color: #736A61; margin-top: 4px;">각자 기록한 찻자리 노트를 볼 수 있어요</p>
             </div>
-
-            <div class="space-y-3">
-                <div id="member-summary-cards" class="space-y-3">
-                    <!-- Dynamically Rendered Member Cards -->
-                </div>
-            </div>
+            <div id="member-summary-cards" style="display: flex; flex-direction: column; gap: 12px;"></div>
         </div>
 
-        <!-- Empty State (Global) -->
-        <div id="empty-state" class="hidden text-center py-16 px-4">
-            <div class="text-4xl mb-3">🫖</div>
-            <p class="font-serif-kr text-base text-[#5C524B] mb-1">아직 등록된 찻자리가 없어요</p>
-            <p class="text-xs text-[#8C8279] mb-4">상단 '찻자리 카드 등록' 버튼을 눌러 모임을 먼저 생성해보세요!</p>
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden" style="text-align: center; padding: 64px 16px;">
+            <div style="font-size: 36px; margin-bottom: 12px;">🫖</div>
+            <p style="font-size: 15px; color: #5C524B; font-weight: bold; margin-bottom: 4px;">아직 등록된 찻자리가 없어요</p>
+            <p style="font-size: 12px; color: #8C8279;">상단 '카드 등록' 버튼을 눌러 모임을 먼저 생성해보세요!</p>
         </div>
 
     </main>
 
-    <!-- Bottom Navigation Bar (Tabs) -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-[#FBF9F5] border-t border-[#E3DFD5] py-2.5 px-6 z-10 shadow-lg">
-        <div class="max-w-md mx-auto flex justify-around items-center">
-            <button onclick="switchTab('home')" id="nav-btn-home" class="flex flex-col items-center space-y-1 text-[#79553D] font-medium transition">
-                <i class="fa-solid fa-house text-base"></i>
-                <span class="text-[11px]">홈</span>
+    <!-- Navigation Bar -->
+    <nav>
+        <div style="max-width: 440px; margin: 0 auto; display: flex; justify-content: space-around; align-items: center;">
+            <button onclick="switchTab('home')" id="nav-btn-home" class="active">
+                <i class="fa-solid fa-house" style="font-size: 16px;"></i>
+                <span>홈</span>
             </button>
-            <button onclick="switchTab('log')" id="nav-btn-log" class="flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition">
-                <i class="fa-solid fa-book-bookmark text-base"></i>
-                <span class="text-[11px]">로그</span>
+            <button onclick="switchTab('log')" id="nav-btn-log">
+                <i class="fa-solid fa-book-bookmark" style="font-size: 16px;"></i>
+                <span>로그</span>
             </button>
         </div>
     </nav>
 
-    <!-- Modal 1: 찻자리 카드 등록 모달 -->
-    <div id="gathering-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center sm:p-4 hidden transition-opacity">
-        <div class="bg-[#FBF9F5] w-full sm:max-w-lg max-h-[90vh] rounded-t-3xl sm:rounded-2xl shadow-xl flex flex-col overflow-hidden">
-            <div class="px-5 py-4 border-b border-[#E8E2D5] flex items-center justify-between bg-[#F5F2EC]">
-                <h3 class="font-serif-kr font-semibold text-sm text-[#4E433C]">찻자리 카드 등록하기</h3>
-                <button onclick="closeGatheringModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-[#736A61] hover:bg-[#EAE4D8] transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <!-- Modal 1: Gathering -->
+    <div id="gathering-modal" class="modal-bg hidden">
+        <div class="modal-content">
+            <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: background: #F5F2EC;">
+                <h3 style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 카드 등록하기</h3>
+                <button onclick="closeGatheringModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61;"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-5 overflow-y-auto flex-1">
-                <form id="gathering-form" onsubmit="saveGatheringCard(event)" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
+            <div style="padding: 20px; overflow-y: auto;">
+                <form id="gathering-form" onsubmit="saveGatheringCard(event)" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
-                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">모임 날짜 *</label>
-                            <input type="date" id="g-date" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                            <label class="form-label">모임 날짜 *</label>
+                            <input type="date" id="g-date" required class="form-input">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">날씨 *</label>
-                            <select id="g-weather" class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none">
+                            <label class="form-label">날씨 *</label>
+                            <select id="g-weather" class="form-select">
                                 <option value="☀️ 맑음">☀️ 맑음</option>
                                 <option value="☁️ 흐림">☁️ 흐림</option>
                                 <option value="🌧️ 비">🌧️ 비</option>
@@ -152,26 +247,24 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-3">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
-                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">티하우스 이름 *</label>
-                            <input type="text" id="g-teahouse" placeholder="예: 절영 티룸" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                            <label class="form-label">티하우스 이름 *</label>
+                            <input type="text" id="g-teahouse" placeholder="예: 절영 티룸" required class="form-input">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">티하우스 지역 *</label>
-                            <input type="text" id="g-region" placeholder="예: 서울 종로구" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                            <label class="form-label">티하우스 지역 *</label>
+                            <input type="text" id="g-region" placeholder="예: 서울 종로구" required class="form-input">
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-3">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
-                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">이번 달 주제</label>
-                            <input type="text" id="g-theme" placeholder="예: 백차 탐구" class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                            <label class="form-label">이번 달 주제</label>
+                            <input type="text" id="g-theme" placeholder="예: 백차 탐구" class="form-input">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-medium text-[#685D54] mb-1">담당자</label>
-                            <select id="g-manager" class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none">
+                            <label class="form-label">담당자</label>
+                            <select id="g-manager" class="form-select">
                                 <option value="경민">경민</option>
                                 <option value="다인">다인</option>
                                 <option value="다은">다은</option>
@@ -179,78 +272,61 @@
                             </select>
                         </div>
                     </div>
-
                     <div>
-                        <label class="block text-[11px] font-medium text-[#685D54] mb-1">티하우스 설명</label>
-                        <input type="text" id="g-description" placeholder="예: 센차와 화과자가 유명한 곳" class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                        <label class="form-label">티하우스 설명</label>
+                        <input type="text" id="g-description" placeholder="예: 센차와 화과자가 유명한 곳" class="form-input">
                     </div>
-
-                    <div class="pt-2">
-                        <button type="submit" class="w-full bg-[#79553D] text-white py-3 rounded-xl font-medium text-xs shadow hover:bg-[#624430] transition">
-                            찻자리 카드 생성하기
-                        </button>
+                    <div style="margin-top: 8px;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; border-radius: 12px;">찻자리 카드 생성하기</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Modal 2: 개인 기록하기 모달 -->
-    <div id="record-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center sm:p-4 hidden transition-opacity">
-        <div class="bg-[#FBF9F5] w-full sm:max-w-lg max-h-[90vh] rounded-t-3xl sm:rounded-2xl shadow-xl flex flex-col overflow-hidden">
-            <div class="px-5 py-4 border-b border-[#E8E2D5] flex items-center justify-between bg-[#F5F2EC]">
-                <h3 class="font-serif-kr font-semibold text-sm text-[#4E433C]">찻자리 기록 남기기</h3>
-                <button onclick="closeRecordModal()" class="w-8 h-8 rounded-full flex items-center justify-center text-[#736A61] hover:bg-[#EAE4D8] transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <!-- Modal 2: Record -->
+    <div id="record-modal" class="modal-bg hidden">
+        <div class="modal-content">
+            <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: space-between;">
+                <h3 style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 기록 남기기</h3>
+                <button onclick="closeRecordModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61;"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-5 overflow-y-auto flex-1">
-                <form id="record-form" onsubmit="saveMemberRecords(event)" class="space-y-4">
+            <div style="padding: 20px; overflow-y: auto;">
+                <form id="record-form" onsubmit="saveMemberRecords(event)" style="display: flex; flex-direction: column; gap: 12px;">
                     <div>
-                        <label class="block text-[11px] font-medium text-[#685D54] mb-1">찻자리 선택 (티하우스) *</label>
-                        <select id="rec-gathering-id" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none">
-                            <!-- Populated dynamically -->
-                        </select>
+                        <label class="form-label">찻자리 선택 *</label>
+                        <select id="rec-gathering-id" required class="form-select"></select>
                     </div>
-
                     <div>
-                        <label class="block text-[11px] font-medium text-[#685D54] mb-1">기록자 (멤버 선택) *</label>
-                        <select id="rec-member" required class="w-full text-xs px-3 py-2 bg-white border border-[#E3DFD5] rounded-lg focus:outline-none">
+                        <label class="form-label">기록자 (멤버) *</label>
+                        <select id="rec-member" required class="form-select">
                             <option value="경민">경민</option>
                             <option value="다인">다인</option>
                             <option value="다은">다은</option>
                             <option value="보현">보현</option>
                         </select>
                     </div>
-
-                    <div class="space-y-3 pt-2 border-t border-[#E8E2D5]">
+                    <div style="border-top: 1px solid #E8E2D5; padding-top: 12px; display: flex; flex-direction: column; gap: 10px;">
                         <div class="flex items-center justify-between">
-                            <h4 class="text-xs font-bold text-[#79553D] uppercase">마신 차 리스트</h4>
-                            <button type="button" onclick="addModalTeaItem()" class="text-xs text-[#79553D] font-medium bg-[#F5F2EC] px-2.5 py-1 rounded-md hover:bg-[#EAE4D8] transition">
-                                <i class="fa-solid fa-plus text-[9px]"></i> 차 추가하기
+                            <h4 style="font-size: 12px; font-weight: bold; color: #79553D;">마신 차 리스트</h4>
+                            <button type="button" onclick="addModalTeaItem()" class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">
+                                <i class="fa-solid fa-plus"></i> 차 추가
                             </button>
                         </div>
-                        <div id="modal-tea-items-container" class="space-y-3">
-                            <!-- Dynamic items -->
-                        </div>
+                        <div id="modal-tea-items-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
                     </div>
-
-                    <div class="pt-3">
-                        <button type="submit" class="w-full bg-[#79553D] text-white py-3 rounded-xl font-medium text-xs shadow hover:bg-[#624430] transition">
-                            내 기록 저장하기
-                        </button>
+                    <div style="margin-top: 8px;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; border-radius: 12px;">내 기록 저장하기</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Toast Message Box -->
-    <div id="toast" class="fixed bottom-16 left-1/2 transform -translate-x-1/2 bg-[#3C3633] text-white text-xs px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50">
-        알림 메시지입니다.
-    </div>
+    <!-- Toast Message -->
+    <div id="toast">알림 메시지입니다.</div>
 
-    <!-- JavaScript Application Logic -->
+    <!-- JS Logic -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyHll6QgzCJTbkRMP1QSt3yL7MVA90RVfUGUXNdFgeMyThd8mwk7EW_ofn4VHM3Rl1C/exec";
         const MEMBERS = ["경민", "다인", "다은", "보현"];
@@ -267,7 +343,6 @@
 
         let gatherings = [];
         let memberExpandedState = {};
-        let currentTab = 'home';
 
         window.onload = async function() {
             await loadFromGoogleSheet();
@@ -280,16 +355,11 @@
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.classList.remove('opacity-0');
-            toast.classList.add('opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('opacity-100');
-                toast.classList.add('opacity-0');
-            }, 2500);
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2500);
         }
 
         function switchTab(tab) {
-            currentTab = tab;
             const homeTab = document.getElementById('tab-home');
             const logTab = document.getElementById('tab-log');
             const btnHome = document.getElementById('nav-btn-home');
@@ -298,13 +368,13 @@
             if (tab === 'home') {
                 homeTab.classList.remove('hidden');
                 logTab.classList.add('hidden');
-                btnHome.className = "flex flex-col items-center space-y-1 text-[#79553D] font-medium transition";
-                btnLog.className = "flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition";
+                btnHome.classList.add('active');
+                btnLog.classList.remove('active');
             } else {
                 homeTab.classList.add('hidden');
                 logTab.classList.remove('hidden');
-                btnLog.className = "flex flex-col items-center space-y-1 text-[#79553D] font-medium transition";
-                btnHome.className = "flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition";
+                btnLog.classList.add('active');
+                btnHome.classList.remove('active');
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -313,16 +383,10 @@
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
-                
-                if (!data.gatherings || !Array.isArray(data.gatherings) || data.gatherings.length === 0) {
-                    gatherings = [];
-                } else {
-                    gatherings = data.gatherings;
-                }
+                gatherings = (data.gatherings && Array.isArray(data.gatherings)) ? data.gatherings : [];
             } catch(e) {
-                console.error("데이터 로드 실패", e);
                 gatherings = [];
-                showToast("데이터를 불러오는데 실패했습니다.");
+                showToast("데이터 로드 실패");
             }
         }
 
@@ -343,8 +407,7 @@
                     body: JSON.stringify({ type: 'gathering', payload: currentGatherings })
                 });
             } catch (e) {
-                console.error("서버 전송 실패", e);
-                showToast("서버 전송 중 오류가 발생했습니다.");
+                showToast("서버 전송 중 오류 발생");
             }
         }
 
@@ -352,22 +415,16 @@
             const grid = document.getElementById('teacups-grid');
             const countLabel = document.getElementById('tracker-count-label');
             grid.innerHTML = '';
-            
             const totalCount = gatherings.length;
             countLabel.textContent = `${totalCount} / 12 달성`;
 
             for (let i = 0; i < 12; i++) {
                 const isFilled = i < totalCount;
                 const cupEl = document.createElement('div');
-                cupEl.className = `aspect-square rounded-xl border flex flex-col items-center justify-center transition-all ${
-                    isFilled 
-                        ? 'bg-[#F3C68F]/30 border-[#D8A462] shadow-xs transform scale-102' 
-                        : 'bg-white/50 border-[#E8E2D5] opacity-50'
-                }`;
-                
+                cupEl.className = `teacup-box ${isFilled ? 'filled' : ''}`;
                 cupEl.innerHTML = `
-                    <span class="text-base">${isFilled ? '🍵' : '☕'}</span>
-                    <span class="text-[9px] font-semibold mt-0.5 ${isFilled ? 'text-[#79553D]' : 'text-[#A89F91]'}">#${i + 1}</span>
+                    <span style="font-size: 16px;">${isFilled ? '🍵' : '☕'}</span>
+                    <span style="font-size: 9px; font-weight: 600; margin-top: 2px; color: ${isFilled ? '#79553D' : '#A89F91'};">#${i + 1}</span>
                 `;
                 grid.appendChild(cupEl);
             }
@@ -376,66 +433,46 @@
         function openGatheringModal() {
             const password = prompt("멤버 전용 비밀번호를 입력해주세요:");
             if (password !== MEMBER_PASSWORD) {
-                if (password !== null) {
-                    showToast("비밀번호가 일치하지 않습니다. (멤버 전용)");
-                }
+                if (password !== null) showToast("비밀번호가 틀렸습니다.");
                 return;
             }
-
             document.getElementById('gathering-form').reset();
             document.getElementById('g-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('gathering-modal').classList.remove('hidden');
         }
 
-        function closeGatheringModal() {
-            document.getElementById('gathering-modal').classList.add('hidden');
-        }
+        function closeGatheringModal() { document.getElementById('gathering-modal').classList.add('hidden'); }
 
         async function saveGatheringCard(e) {
             e.preventDefault();
-            const date = document.getElementById('g-date').value;
-            const weather = document.getElementById('g-weather').value;
-            const teahouse = document.getElementById('g-teahouse').value;
-            const region = document.getElementById('g-region').value;
-            const theme = document.getElementById('g-theme').value;
-            const manager = document.getElementById('g-manager').value;
-            const description = document.getElementById('g-description').value;
-
             const newGathering = {
                 id: 'g_' + Date.now(),
-                date,
-                weather,
-                teahouse,
-                region,
-                theme,
-                manager,
-                description,
+                date: document.getElementById('g-date').value,
+                weather: document.getElementById('g-weather').value,
+                teahouse: document.getElementById('g-teahouse').value,
+                region: document.getElementById('g-region').value,
+                theme: document.getElementById('g-theme').value,
+                manager: document.getElementById('g-manager').value,
+                description: document.getElementById('g-description').value,
                 memberRecords: {}
             };
-
             gatherings.unshift(newGathering);
             await sendToSheet('gathering', newGathering);
-            renderTracker();
-            renderGatherings();
-            renderMemberSummaries();
+            renderTracker(); renderGatherings(); renderMemberSummaries();
             closeGatheringModal();
-            showToast("찻자리 카드가 생성되었습니다 🍵");
+            showToast("찻자리 카드 생성 완료 🍵");
         }
 
         function openRecordModal() {
             if (gatherings.length === 0) {
-                showToast("먼저 등록된 찻자리 카드가 없습니다!");
+                showToast("등록된 찻자리가 없습니다!");
                 return;
             }
-
             const password = prompt("멤버 전용 비밀번호를 입력해주세요:");
             if (password !== MEMBER_PASSWORD) {
-                if (password !== null) {
-                    showToast("비밀번호가 일치하지 않습니다. (멤버 전용)");
-                }
+                if (password !== null) showToast("비밀번호가 틀렸습니다.");
                 return;
             }
-
             const selectEl = document.getElementById('rec-gathering-id');
             selectEl.innerHTML = '';
             gatherings.forEach(g => {
@@ -444,83 +481,68 @@
                 opt.textContent = `[${g.date}] ${g.teahouse} (${g.region})`;
                 selectEl.appendChild(opt);
             });
-
             document.getElementById('modal-tea-items-container').innerHTML = '';
             addModalTeaItem();
             document.getElementById('record-modal').classList.remove('hidden');
         }
 
-        function closeRecordModal() {
-            document.getElementById('record-modal').classList.add('hidden');
-        }
+        function closeRecordModal() { document.getElementById('record-modal').classList.add('hidden'); }
 
         function addModalTeaItem(data = {}) {
             const container = document.getElementById('modal-tea-items-container');
             const idx = container.children.length;
-            
             const itemDiv = document.createElement('div');
-            itemDiv.className = "bg-[#FBF9F5] p-3 rounded-lg border border-[#E3DFD5] space-y-2.5 relative";
+            itemDiv.style.cssText = "background: #FBF9F5; padding: 12px; border-radius: 8px; border: 1px solid #E3DFD5; display: flex; flex-direction: column; gap: 8px;";
             
             let typeOptions = TEA_TYPES.map(t => `<option value="${t}" ${data.type === t ? 'selected' : ''}>${t}</option>`).join('');
-            
             let colorButtonsHTML = '';
             LIQUOR_COLORS.forEach(c => {
                 const isSelected = (data.colorHex === c.hex) || (!data.colorHex && c.hex === "#F3C68F");
                 colorButtonsHTML += `
                     <button type="button" 
-                        class="w-6 h-6 rounded-full border-2 transition transform hover:scale-110 color-btn ${isSelected ? 'ring-2 ring-[#79553D] scale-105' : ''}" 
-                        style="background-color: ${c.hex}; border-color: ${c.border};" 
-                        title="${c.name}"
+                        class="color-btn" 
+                        style="width: 22px; height: 22px; border-radius: 50%; background-color: ${c.hex}; border: 2px solid ${c.border}; cursor: pointer; ${isSelected ? 'outline: 2px solid #79553D; transform: scale(1.1);' : ''}" 
                         onclick="selectColor(this, '${c.hex}', '${c.name}')">
-                    </button>
-                `;
+                    </button>`;
             });
 
             itemDiv.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-semibold text-[#8C8279] uppercase">차 항목 #${idx + 1}</span>
-                    ${idx > 0 ? `<button type="button" onclick="this.closest('.bg-\\[\\#FBF9F5\\]').remove()" class="text-xs text-red-400 hover:text-red-600"><i class="fa-solid fa-trash-can"></i> 삭제</button>` : ''}
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 10px; font-weight: bold; color: #8C8279;">차 항목 #${idx + 1}</span>
+                    ${idx > 0 ? `<button type="button" onclick="this.closest('div').parentElement.remove()" style="background:none; border:none; color:red; font-size:11px; cursor:pointer;"><i class="fa-solid fa-trash-can"></i> 삭제</button>` : ''}
                 </div>
-
-                <div class="grid grid-cols-2 gap-2">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <div>
-                        <label class="block text-[10px] text-[#685D54] mb-0.5">차 이름 *</label>
-                        <input type="text" name="tea-name" value="${data.name || ''}" placeholder="예: 동정우롱" required class="w-full text-xs px-2.5 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none focus:ring-1 focus:ring-[#79553D]">
+                        <label class="form-label" style="font-size:10px;">차 이름 *</label>
+                        <input type="text" name="tea-name" value="${data.name || ''}" placeholder="예: 동정우롱" required class="form-input" style="margin-top:2px;">
                     </div>
                     <div>
-                        <label class="block text-[10px] text-[#685D54] mb-0.5">차 종류</label>
-                        <select name="tea-type" class="w-full text-xs px-2 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none">
-                            ${typeOptions}
-                        </select>
+                        <label class="form-label" style="font-size:10px;">차 종류</label>
+                        <select name="tea-type" class="form-select" style="margin-top:2px;">${typeOptions}</select>
                     </div>
                 </div>
-
                 <div>
-                    <label class="block text-[10px] text-[#685D54] mb-1">수색 (우린 색상 선택)</label>
-                    <div class="flex items-center space-x-2 bg-white p-2 rounded-md border border-[#E3DFD5]">
-                        <div class="flex items-center space-x-1.5 color-palette-container">
-                            ${colorButtonsHTML}
-                        </div>
+                    <label class="form-label" style="font-size:10px; margin-bottom:4px;">수색 선택</label>
+                    <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 6px 10px; border-radius: 6px; border: 1px solid #E3DFD5;">
+                        <div style="display: flex; gap: 6px;">${colorButtonsHTML}</div>
                         <input type="hidden" name="tea-color-hex" value="${data.colorHex || '#F3C68F'}">
                         <input type="hidden" name="tea-color-name" value="${data.colorName || '따뜻한 호박색'}">
-                        <span class="text-[10px] text-[#736A61] font-medium selected-color-label">${data.colorName || '따뜻한 호박색'}</span>
+                        <span class="selected-color-label" style="font-size: 10px; color: #736A61; font-weight: 500;">${data.colorName || '따뜻한 호박색'}</span>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-2 gap-2">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <div>
-                        <label class="block text-[10px] text-[#685D54] mb-0.5">향과 맛 *</label>
-                        <input type="text" name="tea-flavor" value="${data.flavor || ''}" placeholder="예: 곡물향, 꽃향" required class="w-full text-xs px-2.5 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none">
+                        <label class="form-label" style="font-size:10px;">향과 맛 *</label>
+                        <input type="text" name="tea-flavor" value="${data.flavor || ''}" placeholder="예: 꽃향" required class="form-input" style="margin-top:2px;">
                     </div>
                     <div>
-                        <label class="block text-[10px] text-[#685D54] mb-0.5">함께 먹은 다과</label>
-                        <input type="text" name="tea-snack" value="${data.snack || ''}" placeholder="예: 말차 화과자" class="w-full text-xs px-2.5 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none">
+                        <label class="form-label" style="font-size:10px;">함께 먹은 다과</label>
+                        <input type="text" name="tea-snack" value="${data.snack || ''}" placeholder="예: 화과자" class="form-input" style="margin-top:2px;">
                     </div>
                 </div>
-
                 <div>
-                    <label class="block text-[10px] text-[#685D54] mb-0.5">메모 (시음 소감)</label>
-                    <input type="text" name="tea-memo" value="${data.memo || ''}" placeholder="간단한 메모" class="w-full text-xs px-2.5 py-1.5 bg-white border border-[#E3DFD5] rounded-md focus:outline-none">
+                    <label class="form-label" style="font-size:10px;">메모</label>
+                    <input type="text" name="tea-memo" value="${data.memo || ''}" placeholder="간단 소감" class="form-input" style="margin-top:2px;">
                 </div>
             `;
             container.appendChild(itemDiv);
@@ -529,8 +551,12 @@
         function selectColor(btn, hex, name) {
             const container = btn.closest('div').parentElement;
             const parentPalette = btn.parentElement;
-            parentPalette.querySelectorAll('.color-btn').forEach(b => b.classList.remove('ring-2', 'ring-[#79553D]', 'scale-105'));
-            btn.classList.add('ring-2', 'ring-[#79553D]', 'scale-105');
+            parentPalette.querySelectorAll('.color-btn').forEach(b => {
+                b.style.outline = 'none';
+                b.style.transform = 'scale(1)';
+            });
+            btn.style.outline = '2px solid #79553D';
+            btn.style.transform = 'scale(1.1)';
             
             container.querySelector('[name="tea-color-hex"]').value = hex;
             container.querySelector('[name="tea-color-name"]').value = name;
@@ -545,25 +571,17 @@
             const teaItems = document.querySelectorAll('#modal-tea-items-container > div');
             const teas = [];
             teaItems.forEach(item => {
-                const name = item.querySelector('[name="tea-name"]').value;
-                const type = item.querySelector('[name="tea-type"]').value;
-                const colorHex = item.querySelector('[name="tea-color-hex"]').value;
-                const colorName = item.querySelector('[name="tea-color-name"]').value;
-                const flavor = item.querySelector('[name="tea-flavor"]').value;
-                const snack = item.querySelector('[name="tea-snack"]').value;
-                const memo = item.querySelector('[name="tea-memo"]').value;
-
-                if (name.trim()) {
-                    teas.push({ name, type, colorHex, colorName, flavor, snack, memo });
-                }
+                teas.push({
+                    name: item.querySelector('[name="tea-name"]').value,
+                    type: item.querySelector('[name="tea-type"]').value,
+                    colorHex: item.querySelector('[name="tea-color-hex"]').value,
+                    colorName: item.querySelector('[name="tea-color-name"]').value,
+                    flavor: item.querySelector('[name="tea-flavor"]').value,
+                    snack: item.querySelector('[name="tea-snack"]').value,
+                    memo: item.querySelector('[name="tea-memo"]').value
+                });
             });
 
-            if (teas.length === 0) {
-                showToast("최소 1개 이상의 차를 입력해주세요.");
-                return;
-            }
-
-            // 서버에서 가장 최신 데이터를 불러와서 동기화 후 업데이트 (기존 기록 날라감 방지)
             try {
                 const res = await fetch(API_URL);
                 const serverData = await res.json();
@@ -572,21 +590,17 @@
                 const gathering = currentGatherings.find(g => g.id === gatheringId);
                 if (gathering) {
                     if (!gathering.memberRecords) gathering.memberRecords = {};
-                    // 해당 멤버의 기록을 새로 추가/덮어쓰되 다른 멤버 기록은 유지
                     gathering.memberRecords[member] = teas;
 
                     gatherings = currentGatherings;
                     await sendToSheet('gathering_update', gatherings);
                     
-                    renderTracker();
-                    renderGatherings();
-                    renderMemberSummaries();
+                    renderTracker(); renderGatherings(); renderMemberSummaries();
                     closeRecordModal();
-                    showToast(`${member}님의 기록이 저장되었습니다 🍵`);
+                    showToast(`${member}님 기록 저장 완료 🍵`);
                 }
             } catch (err) {
-                console.error("기록 저장 중 오류 발생", err);
-                showToast("저장 중 오류가 발생했습니다.");
+                showToast("저장 중 오류 발생");
             }
         }
 
@@ -594,9 +608,7 @@
             if (confirm("이 찻자리 카드와 모든 기록을 삭제하시겠습니까?")) {
                 gatherings = gatherings.filter(g => g.id !== id);
                 await sendToSheet('gathering_update', gatherings);
-                renderTracker();
-                renderGatherings();
-                renderMemberSummaries();
+                renderTracker(); renderGatherings(); renderMemberSummaries();
                 showToast("삭제되었습니다.");
             }
         }
@@ -611,62 +623,48 @@
             container.innerHTML = '';
 
             MEMBERS.forEach(member => {
-                let allMemberTeas = [];
+                let allTeas = [];
                 gatherings.forEach(g => {
                     if (g.memberRecords && g.memberRecords[member]) {
-                        g.memberRecords[member].forEach(t => {
-                            allMemberTeas.push({ ...t, teahouse: g.teahouse, date: g.date });
-                        });
+                        g.memberRecords[member].forEach(t => allTeas.push({ ...t, teahouse: g.teahouse }));
                     }
                 });
 
                 const isExpanded = !!memberExpandedState[member];
-                const displayTeas = isExpanded ? allMemberTeas : allMemberTeas.slice(0, 3);
-                const hasMore = allMemberTeas.length > 3;
+                const displayTeas = isExpanded ? allTeas : allTeas.slice(0, 3);
+                let teaHTML = allTeas.length === 0 ? `<p style="font-size:11px; color:#A89F91; font-style:italic;">아직 기록된 차가 없습니다.</p>` : '';
 
-                let teaItemsHTML = '';
-                if (allMemberTeas.length === 0) {
-                    teaItemsHTML = `<p class="text-[11px] text-[#A89F91] italic py-1">아직 기록된 차가 없습니다.</p>`;
-                } else {
-                    displayTeas.forEach(t => {
-                        teaItemsHTML += `
-                            <div class="bg-[#FBF9F5] p-2.5 rounded-lg border border-[#E3DFD5] space-y-1 text-xs">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-1.5">
-                                        <span class="w-2.5 h-2.5 rounded-full shadow-2xs" style="background-color: ${t.colorHex || '#F3C68F'};"></span>
-                                        <span class="font-semibold text-[#4E433C]">${t.name}</span>
-                                        <span class="text-[10px] text-[#8C8279] bg-white px-1.5 py-0.2 rounded border border-[#EFECE6]">${t.type}</span>
-                                    </div>
-                                    <span class="text-[10px] text-[#8C8279]">${t.teahouse}</span>
+                displayTeas.forEach(t => {
+                    teaHTML += `
+                        <div style="background: #FBF9F5; padding: 10px; border-radius: 8px; border: 1px solid #E3DFD5; font-size: 12px; margin-bottom: 6px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <span style="width:10px; height:10px; border-radius:50%; background:${t.colorHex || '#F3C68F'}; display:inline-block;"></span>
+                                    <span style="font-weight:bold; color:#4E433C;">${t.name}</span>
+                                    <span style="font-size:10px; color:#8C8279; background:white; padding:1px 4px; border-radius:4px; border:1px solid #EFECE6;">${t.type}</span>
                                 </div>
-                                <div class="text-[11px] text-[#79553D] font-medium bg-white/70 px-2 py-1 rounded border border-[#F1EFE7]">
-                                    🌿 향과 맛: ${t.flavor}
-                                </div>
-                                ${t.snack ? `<div class="text-[10px] text-[#736A61]">🍡 다과: ${t.snack}</div>` : ''}
-                                ${t.memo ? `<div class="text-[10px] text-[#685D54] italic">💭 메모: ${t.memo}</div>` : ''}
+                                <span style="font-size:10px; color:#8C8279;">${t.teahouse}</span>
                             </div>
-                        `;
-                    });
-                }
+                            <div style="font-size:11px; color:#79553D; font-weight:500; background:rgba(255,255,255,0.7); padding:4px 6px; border-radius:4px; margin-bottom:4px;">
+                                🌿 향과 맛: ${t.flavor}
+                            </div>
+                            ${t.snack ? `<div style="font-size:10px; color:#736A61;">🍡 다과: ${t.snack}</div>` : ''}
+                            ${t.memo ? `<div style="font-size:10px; color:#685D54; font-style:italic; margin-top:2px;">💭 메모: ${t.memo}</div>` : ''}
+                        </div>`;
+                });
 
                 const card = document.createElement('div');
-                card.className = "bg-white border border-[#E8E2D5] rounded-xl p-3.5 shadow-xs space-y-2.5";
+                card.className = "card";
                 card.innerHTML = `
-                    <div class="flex items-center justify-between border-b border-[#F1EFE7] pb-2">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-6 h-6 rounded-full bg-[#79553D] text-white text-xs font-bold flex items-center justify-center">${member.slice(0, 1)}</span>
-                            <h4 class="font-serif-kr font-bold text-xs text-[#4E433C]">${member}의 마신 차 리스트</h4>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #F1EFE7; padding-bottom:8px; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="width:24px; height:24px; border-radius:50%; background:#79553D; color:white; font-size:11px; font-weight:bold; display:flex; align-items:center; justify-content:center;">${member.slice(0, 1)}</span>
+                            <h4 style="font-size:12px; font-weight:bold; color:#4E433C;">${member}의 마신 차 리스트</h4>
                         </div>
-                        <span class="text-[10px] bg-[#F5F2EC] text-[#79553D] px-2 py-0.5 rounded-full font-semibold">총 ${allMemberTeas.length}잔</span>
+                        <span style="font-size:10px; background:#F5F2EC; color:#79553D; padding:2px 8px; border-radius:99px; font-weight:600;">총 ${allTeas.length}잔</span>
                     </div>
-                    <div class="space-y-2">
-                        ${teaItemsHTML}
-                    </div>
-                    ${hasMore ? `
-                        <button onclick="toggleMemberExpand('${member}')" class="w-full text-center text-[11px] text-[#79553D] font-medium py-1.5 bg-[#F5F2EC] hover:bg-[#EAE4D8] rounded-md transition mt-1">
-                            ${isExpanded ? '접기 ∧' : `+ 더보기 (전체 ${allMemberTeas.length}개 보기) ∨`}
-                        </button>
-                    ` : ''}
+                    <div>${teaHTML}</div>
+                    ${allTeas.length > 3 ? `<button onclick="toggleMemberExpand('${member}')" style="width:100\%; font-size:11px; color:#79553D; font-weight:500; padding:8px; background:#F5F2EC; border:none; border-radius:6px; cursor:pointer; margin-top:4px;">${isExpanded ? '접기 ∧' : `+ 더보기 (전체 ${allTeas.length}개 보기) ∨`}</button>` : ''}
                 `;
                 container.appendChild(card);
             });
@@ -676,7 +674,6 @@
             const container = document.getElementById('gatherings-container');
             const emptyState = document.getElementById('empty-state');
             const countLabel = document.getElementById('gathering-count');
-
             countLabel.textContent = `총 ${gatherings.length}개`;
 
             if (gatherings.length === 0) {
@@ -684,33 +681,24 @@
                 emptyState.classList.remove('hidden');
                 return;
             }
-
             emptyState.classList.add('hidden');
             container.innerHTML = '';
 
             gatherings.forEach(g => {
                 const card = document.createElement('div');
-                card.className = "bg-white border border-[#E8E2D5] rounded-2xl shadow-xs overflow-hidden transition hover:shadow-md";
+                card.className = "card";
+                card.style.padding = "0";
+                card.style.overflow = "hidden";
 
                 const formattedDate = g.date.replace(/-/g, '. ');
-
-                const teaMap = {}; 
+                let teaMap = {};
                 if (g.memberRecords) {
                     Object.keys(g.memberRecords).forEach(member => {
-                        const teas = g.memberRecords[member];
-                        if (teas) {
-                            teas.forEach(t => {
-                                if (!teaMap[t.name]) {
-                                    teaMap[t.name] = {
-                                        type: t.type,
-                                        entries: [],
-                                        colors: new Set()
-                                    };
-                                }
-                                teaMap[t.name].entries.push({ member, flavor: t.flavor, colorHex: t.colorHex || '#F3C68F' });
-                                if (t.colorHex) {
-                                    teaMap[t.name].colors.add(t.colorHex);
-                                }
+                        if (g.memberRecords[member]) {
+                            g.memberRecords[member].forEach(t => {
+                                if (!teaMap[t.name]) teaMap[t.name] = { type: t.type, entries: [], colors: new Set() };
+                                teaMap[t.name].entries.push({ member, flavor: t.flavor });
+                                if (t.colorHex) teaMap[t.name].colors.add(t.colorHex);
                             });
                         }
                     });
@@ -718,81 +706,55 @@
 
                 let teaGroupsHTML = '';
                 const teaKeys = Object.keys(teaMap);
-                
                 if (teaKeys.length === 0) {
-                    teaGroupsHTML = `<p class="text-[11px] text-[#A89F91] italic py-1 text-center">아직 등록된 개인 기록이 없어요. 상단 '기록하기'를 눌러보세요!</p>`;
+                    teaGroupsHTML = `<p style="font-size:11px; color:#A89F91; font-style:italic; text-align:center; padding:4px;">등록된 개인 기록이 없어요.</p>`;
                 } else {
                     teaKeys.forEach(teaName => {
-                        const teaInfo = teaMap[teaName];
-                        let colorCirclesHTML = '';
-                        teaInfo.colors.forEach(hex => {
-                            colorCirclesHTML += `<span class="w-3 h-3 rounded-full border border-black/10 inline-block shadow-2xs" style="background-color: ${hex};" title="수색"></span>`;
+                        const info = teaMap[teaName];
+                        let colorCircles = '';
+                        info.colors.forEach(hex => {
+                            colorCircles += `<span style="width:10px; height:10px; border-radius:50%; background:${hex}; border:1px solid rgba(0,0,0,0.1); display:inline-block;"></span>`;
                         });
-
-                        let memberLinesHTML = '';
-                        teaInfo.entries.forEach(entry => {
-                            memberLinesHTML += `
-                                <div class="text-xs text-[#5C524B] flex items-start space-x-1.5 py-0.5">
-                                    <span class="font-bold text-[#79553D] shrink-0">[${entry.member}]</span>
-                                    <span class="text-[#685D54]">향과 맛: ${entry.flavor}</span>
-                                </div>
-                            `;
+                        let entriesHTML = '';
+                        info.entries.forEach(e => {
+                            entriesHTML += `<div style="font-size:11px; color:#5C524B; padding:2px 0;"><span style="font-weight:bold; color:#79553D;">[${e.member}]</span> 향과 맛: ${e.flavor}</div>`;
                         });
-
                         teaGroupsHTML += `
-                            <div class="bg-[#FBF9F5] p-3 rounded-xl border border-[#E3DFD5] space-y-2">
-                                <div class="flex items-center justify-between border-b border-[#F1EFE7] pb-1.5">
-                                    <div class="flex items-center space-x-2">
-                                        <div class="flex items-center space-x-1">
-                                            ${colorCirclesHTML}
-                                        </div>
-                                        <span class="font-serif-kr font-bold text-xs text-[#3C3633]">${teaName}</span>
-                                        <span class="text-[10px] text-[#8C8279] bg-white px-1.5 py-0.2 rounded border border-[#EFECE6]">${teaInfo.type}</span>
+                            <div style="background:#FBF9F5; padding:10px; border-radius:8px; border:1px solid #E3DFD5; margin-bottom:8px;">
+                                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #F1EFE7; padding-bottom:4px; margin-bottom:4px;">
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <div style="display:flex; gap:2px;">${colorCircles}</div>
+                                        <span style="font-weight:bold; font-size:12px; color:#3C3633;">${teaName}</span>
+                                        <span style="font-size:10px; color:#8C8279; background:white; padding:1px 4px; border-radius:4px;">${info.type}</span>
                                     </div>
                                 </div>
-                                <div class="space-y-1 pl-1">
-                                    ${memberLinesHTML}
-                                </div>
-                            </div>
-                        `;
+                                <div>${entriesHTML}</div>
+                            </div>`;
                     });
                 }
 
                 card.innerHTML = `
-                    <div class="bg-[#F5F2EC] px-4 py-3 border-b border-[#E8E2D5]">
-                        <div class="flex items-center justify-between mb-1">
-                            <div class="flex items-center space-x-1.5">
-                                <span class="text-[11px] font-semibold text-[#79553D] bg-white px-2 py-0.5 rounded border border-[#E3DFD5]">${formattedDate}</span>
-                                <span class="text-[11px] text-[#736A61]">${g.weather || ''}</span>
-                                <span class="text-[11px] text-[#736A61] bg-white/60 px-1.5 py-0.5 rounded">📍 ${g.region}</span>
+                    <div style="background:#F5F2EC; padding:12px 16px; border-bottom:1px solid #E8E2D5;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <span style="font-size:10px; font-weight:600; color:#79553D; background:white; padding:2px 6px; border-radius:4px; border:1px solid #E3DFD5;">${formattedDate}</span>
+                                <span style="font-size:10px; color:#736A61;">${g.weather || ''}</span>
+                                <span style="font-size:10px; color:#736A61; background:rgba(255,255,255,0.6); padding:2px 6px; border-radius:4px;">📍 ${g.region}</span>
                             </div>
-                            <button onclick="deleteGathering('${g.id}')" class="text-xs text-[#A89F91] hover:text-red-500 p-1 transition" title="기록 삭제">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
+                            <button onclick="deleteGathering('${g.id}')" style="background:none; border:none; color:#A89F91; cursor:pointer;" title="삭제"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
-                        <div class="flex items-center justify-between mt-1">
-                            <h3 class="font-serif-kr font-bold text-base text-[#3C3633] flex items-center space-x-1.5">
-                                <i class="fa-solid fa-mug-hot text-[#79553D] text-sm"></i>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3 style="font-size:14px; font-weight:bold; color:#3C3633; display:flex; align-items:center; gap:6px;">
+                                <i class="fa-solid fa-mug-hot" style="color:#79553D; font-size:12px;"></i>
                                 <span>${g.teahouse}</span>
                             </h3>
-                            ${g.theme ? `<span class="text-[11px] font-medium text-[#5C524B] bg-[#EFECE6] px-2 py-0.5 rounded-full"># ${g.theme}</span>` : ''}
+                            ${g.theme ? `<span style="font-size:10px; font-weight:500; color:#5C524B; background:#EFECE6; padding:2px 8px; border-radius:99px;"># ${g.theme}</span>` : ''}
                         </div>
-                        ${g.description ? `
-                            <p class="text-xs text-[#685D54] mt-2 bg-white/80 p-2 rounded-lg border border-[#E8E2D5] italic">
-                                💡 ${g.description}
-                            </p>
-                        ` : ''}
-                        <div class="text-[10px] text-[#8C8279] mt-2">
-                            담당자: ${g.manager || '경민'}
-                        </div>
+                        ${g.description ? `<p style="font-size:11px; color:#685D54; margin-top:6px; background:white; padding:6px 8px; border-radius:6px; border:1px solid #E8E2D5; font-style:italic;">💡 ${g.description}</p>` : ''}
+                        <div style="font-size:10px; color:#8C8279; margin-top:6px;">담당자: ${g.manager || '경민'}</div>
                     </div>
-                    <div class="p-4 space-y-3">
-                        <div class="space-y-2.5">
-                            ${teaGroupsHTML}
-                        </div>
-                    </div>
+                    <div style="padding: 12px 16px;">${teaGroupsHTML}</div>
                 `;
-
                 container.appendChild(card);
             });
         }
