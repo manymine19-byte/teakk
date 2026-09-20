@@ -252,6 +252,7 @@
 
     <!-- JavaScript Application Logic -->
     <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyHll6QgzCJTbkRMP1QSt3yL7MVA90RVfUGUXNdFgeMyThd8mwk7EW_ofn4VHM3Rl1C/exec";
         const MEMBERS = ["경민", "다인", "다은", "보현"];
         const TEA_TYPES = ["녹차", "홍차", "우롱차", "흑차", "백차", "황차", "허브티/블렌디드", "말차", "티음료"];
         
@@ -268,83 +269,96 @@
         let memberExpandedState = {};
         let currentTab = 'home';
 
-        window.onload = function() {
-            loadFromLocalStorage();
-            renderTracker();
-            renderGatherings();
-            renderMemberSummaries();
-            document.getElementById('g-date').value = new Date().toISOString().split('T')[0];
-        };
+       window.onload = async function() {
+    await loadFromGoogleSheet(); // 구글 시트에서 데이터 불러오기
+    renderTracker();
+    renderGatherings();
+    renderMemberSummaries();
+    document.getElementById('g-date').value = new Date().toISOString().split('T')[0];
+};
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.remove('opacity-0');
-            toast.classList.add('opacity-100');
-            setTimeout(() => {
-                toast.classList.remove('opacity-100');
-                toast.classList.add('opacity-0');
-            }, 2500);
-        }
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('opacity-0');
+    toast.classList.add('opacity-100');
+    setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+    }, 2500);
+}
 
-        function switchTab(tab) {
-            currentTab = tab;
-            const homeTab = document.getElementById('tab-home');
-            const logTab = document.getElementById('tab-log');
-            const btnHome = document.getElementById('nav-btn-home');
-            const btnLog = document.getElementById('nav-btn-log');
+function switchTab(tab) {
+    currentTab = tab;
+    const homeTab = document.getElementById('tab-home');
+    const logTab = document.getElementById('tab-log');
+    const btnHome = document.getElementById('nav-btn-home');
+    const btnLog = document.getElementById('nav-btn-log');
 
-            if (tab === 'home') {
-                homeTab.classList.remove('hidden');
-                logTab.classList.add('hidden');
-                btnHome.className = "flex flex-col items-center space-y-1 text-[#79553D] font-medium transition";
-                btnLog.className = "flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition";
-            } else {
-                homeTab.classList.add('hidden');
-                logTab.classList.remove('hidden');
-                btnLog.className = "flex flex-col items-center space-y-1 text-[#79553D] font-medium transition";
-                btnHome.className = "flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition";
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    if (tab === 'home') {
+        homeTab.classList.remove('hidden');
+        logTab.classList.add('hidden');
+        btnHome.className = "flex flex-col items-center space-y-1 text-[#79553D] font-medium transition";
+        btnLog.className = "flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition";
+    } else {
+        homeTab.classList.add('hidden');
+        logTab.classList.remove('hidden');
+        btnLog.className = "flex flex-col items-center space-y-1 text-[#79553D] font-medium transition";
+        btnHome.className = "flex flex-col items-center space-y-1 text-[#A89F91] font-medium transition";
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('teakkk_gatherings_v2');
-            if (saved) {
-                try {
-                    gatherings = JSON.parse(saved);
-                } catch(e) {
-                    gatherings = [];
-                }
-            } else {
-                gatherings = [
-                    {
-                        id: "sample-1",
-                        date: "2026-03-20",
-                        weather: "☀️ 맑음",
-                        teahouse: "고요한 찻집",
-                        region: "서울 마포구",
-                        theme: "봄맞이 우롱차 코스",
-                        manager: "경민",
-                        description: "고요한 분위기 속에서 대만 우롱차를 즐길 수 있는 아늑한 공간",
-                        memberRecords: {
-                            "경민": [
-                                { name: "대만 동정우롱", type: "우롱차", colorHex: "#F3C68F", colorName: "따뜻한 호박색", flavor: "구수한 곡물향, 은은한 난꽃향", snack: "말차 화과자", memo: "여운이 김" }
-                            ],
-                            "다인": [
-                                { name: "대만 동정우롱", type: "우롱차", colorHex: "#F3C68F", colorName: "따뜻한 호박색", flavor: "난꽃향이 부드럽게 감돌음", snack: "양갱", memo: "맛있음" }
-                            ]
-                        }
+// 🌐 구글 시트에서 데이터를 불러오는 함수
+async function loadFromGoogleSheet() {
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        // 구글 시트에 데이터가 없거나 비어있을 경우 기본 샘플 데이터 세팅
+        if (!data.gatherings || data.gatherings.length === 0) {
+            gatherings = [
+                {
+                    id: "sample-1",
+                    date: "2026-03-20",
+                    weather: "☀️ 맑음",
+                    teahouse: "고요한 찻집",
+                    region: "서울 마포구",
+                    theme: "봄맞이 우롱차 코스",
+                    manager: "경민",
+                    description: "고요한 분위기 속에서 대만 우롱차를 즐길 수 있는 아늑한 공간",
+                    memberRecords: {
+                        "경민": [
+                            { name: "대만 동정우롱", type: "우롱차", colorHex: "#F3C68F", colorName: "따뜻한 호박색", flavor: "구수한 곡물향, 은은한 난꽃향", snack: "말차 화과자", memo: "여운이 김" }
+                        ],
+                        "다인": [
+                            { name: "대만 동정우롱", type: "우롱차", colorHex: "#F3C68F", colorName: "따뜻한 호박색", flavor: "난꽃향이 부드럽게 감돌음", snack: "양갱", memo: "맛있음" }
+                        ]
                     }
-                ];
-                saveToLocalStorage();
-            }
+                }
+            ];
+        } else {
+            gatherings = data.gatherings;
         }
+    } catch(e) {
+        console.error("데이터 로드 실패", e);
+        gatherings = [];
+        showToast("데이터를 불러오는데 실패했습니다.");
+    }
+}
 
-        function saveToLocalStorage() {
-            localStorage.setItem('teakkk_gatherings_v2', JSON.stringify(gatherings));
-        }
-
+// 🌐 구글 시트로 데이터를 전송(저장)하는 공통 함수
+async function sendToSheet(type, payload) {
+    try {
+        await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ type, payload })
+        });
+    } catch (e) {
+        console.error("서버 전송 실패", e);
+        showToast("서버 전송 중 오류가 발생했습니다.");
+    }
+}
         function renderTracker() {
             const grid = document.getElementById('teacups-grid');
             const countLabel = document.getElementById('tracker-count-label');
@@ -403,7 +417,7 @@
             };
 
             gatherings.unshift(newGathering);
-            saveToLocalStorage();
+            await sendToSheet('gathering', newGathering);
             renderTracker();
             renderGatherings();
             renderMemberSummaries();
@@ -545,17 +559,12 @@
             }
 
             const gathering = gatherings.find(g => g.id === gatheringId);
-            if (gathering) {
-                if (!gathering.memberRecords) gathering.memberRecords = {};
-                gathering.memberRecords[member] = teas;
-                saveToLocalStorage();
-                renderGatherings();
-                renderMemberSummaries();
-                closeRecordModal();
-                showToast(`${member}님의 기록이 성공적으로 저장되었습니다 🍵`);
-            }
-        }
+if (gathering) {
+    if (!gathering.memberRecords) gathering.memberRecords = {};
+    gathering.memberRecords[member] = teas;
 
+    // 전체 업데이트된 gatherings 데이터를 시트에 통째로 동기화 전송
+    await sendToSheet('gathering_update', gatherings); // 또는 전체 배열 전송 방식 활용
         function deleteGathering(id) {
             if (confirm("이 찻자리 카드와 모든 기록을 삭제하시겠습니까?")) {
                 gatherings = gatherings.filter(g => g.id !== id);
