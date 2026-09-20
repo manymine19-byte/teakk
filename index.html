@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>티크크 - 찻자리 기록장</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts (Inter & Noto Serif KR) -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://tailwindcss.com"></script>
+    <!-- Pretendard Font CDN -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <!-- FontAwesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            font-family: 'Inter', 'Noto Serif KR', sans-serif;
+            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
             background-color: #FBF9F5;
             color: #3C3633;
         }
         .font-serif-kr {
-            font-family: 'Noto Serif KR', serif;
+            font-family: "Pretendard Variable", Pretendard, sans-serif;
         }
         ::-webkit-scrollbar {
             width: 4px;
@@ -255,7 +255,6 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbyHll6QgzCJTbkRMP1QSt3yL7MVA90RVfUGUXNdFgeMyThd8mwk7EW_ofn4VHM3Rl1C/exec";
         const MEMBERS = ["경민", "다인", "다은", "보현"];
         const TEA_TYPES = ["녹차", "홍차", "우롱차", "흑차", "백차", "황차", "허브티/블렌디드", "말차", "티음료"];
-// 4명의 멤버 전용 비밀번호 설정
         const MEMBER_PASSWORD = "duck2026";
         const LIQUOR_COLORS = [
             { name: "투명/맑음", hex: "#FAF8F5", border: "#E3DFD5" },
@@ -310,34 +309,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-       // 구글 시트에서 데이터 가져오기
         async function loadFromGoogleSheet() {
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
                 
-                // GAS에서 가져온 gatherings 데이터가 배열 형태인지 확인
                 if (!data.gatherings || !Array.isArray(data.gatherings) || data.gatherings.length === 0) {
-                    gatherings = [
-                        {
-                            id: "sample-1",
-                            date: "2026-03-20",
-                            weather: "☀️ 맑음",
-                            teahouse: "고요한 찻집",
-                            region: "서울 마포구",
-                            theme: "봄맞이 우롱차 코스",
-                            manager: "경민",
-                            description: "고요한 분위기 속에서 대만 우롱차를 즐길 수 있는 아늑한 공간",
-                            memberRecords: {
-                                "경민": [
-                                    { name: "대만 동정우롱", type: "우롱차", colorHex: "#F3C68F", colorName: "따뜻한 호박색", flavor: "구수한 곡물향, 은은한 난꽃향", snack: "말차 화과자", memo: "여운이 김" }
-                                ],
-                                "다인": [
-                                    { name: "대만 동정우롱", type: "우롱차", colorHex: "#F3C68F", colorName: "따뜻한 호박색", flavor: "난꽃향이 부드럽게 감돌음", snack: "양갱", memo: "맛있음" }
-                                ]
-                            }
-                        }
-                    ];
+                    gatherings = [];
                 } else {
                     gatherings = data.gatherings;
                 }
@@ -348,24 +326,18 @@
             }
         }
 
-      // 구글 시트로 데이터 전송 (기존 데이터 누락 방지 및 최신 상태 동기화)
         async function sendToSheet(type, payload) {
             try {
-                // 1. 서버에서 최신 데이터를 먼저 불러옴 (동시 수정 충돌 방지)
                 const res = await fetch(API_URL);
                 const serverData = await res.json();
                 let currentGatherings = serverData.gatherings || [];
 
-                // 2. 액션 타입에 따라 gatherings 배열 조작
                 if (type === 'gathering') {
-                    // 새로운 찻자리 카드 추가인 경우: 기존 목록 맨 앞에 추가
                     currentGatherings.unshift(payload);
                 } else if (type === 'gathering_update' || type === 'record') {
-                    // 찻자리 수정 또는 개인 기록(기록하기) 추가인 경우: 전체 최신 gatherings 배열로 교체
                     currentGatherings = payload;
                 }
 
-                // 3. 최종 병합된 데이터를 서버로 POST 전송
                 await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ type: 'gathering', payload: currentGatherings })
@@ -375,6 +347,7 @@
                 showToast("서버 전송 중 오류가 발생했습니다.");
             }
         }
+
         function renderTracker() {
             const grid = document.getElementById('teacups-grid');
             const countLabel = document.getElementById('tracker-count-label');
@@ -399,9 +372,6 @@
                 grid.appendChild(cupEl);
             }
         }
-
-       // 4명의 멤버 전용 비밀번호 설정
-        const MEMBER_PASSWORD = "duck2026";
 
         function openGatheringModal() {
             const password = prompt("멤버 전용 비밀번호를 입력해주세요:");
@@ -465,20 +435,6 @@
                 }
                 return;
             }
-
-            const selectEl = document.getElementById('rec-gathering-id');
-            selectEl.innerHTML = '';
-            gatherings.forEach(g => {
-                const opt = document.createElement('option');
-                opt.value = g.id;
-                opt.textContent = `[${g.date}] ${g.teahouse} (${g.region})`;
-                selectEl.appendChild(opt);
-            });
-
-            document.getElementById('modal-tea-items-container').innerHTML = '';
-            addModalTeaItem();
-            document.getElementById('record-modal').classList.remove('hidden');
-        }
 
             const selectEl = document.getElementById('rec-gathering-id');
             selectEl.innerHTML = '';
@@ -607,17 +563,30 @@
                 return;
             }
 
-            const gathering = gatherings.find(g => g.id === gatheringId);
-            if (gathering) {
-                if (!gathering.memberRecords) gathering.memberRecords = {};
-                gathering.memberRecords[member] = teas;
+            // 서버에서 가장 최신 데이터를 불러와서 동기화 후 업데이트 (기존 기록 날라감 방지)
+            try {
+                const res = await fetch(API_URL);
+                const serverData = await res.json();
+                let currentGatherings = serverData.gatherings || gatherings;
 
-                await sendToSheet('gathering_update', gatherings);
-                renderTracker();
-                renderGatherings();
-                renderMemberSummaries();
-                closeRecordModal();
-                showToast(`${member}님의 기록이 저장되었습니다 🍵`);
+                const gathering = currentGatherings.find(g => g.id === gatheringId);
+                if (gathering) {
+                    if (!gathering.memberRecords) gathering.memberRecords = {};
+                    // 해당 멤버의 기록을 새로 추가/덮어쓰되 다른 멤버 기록은 유지
+                    gathering.memberRecords[member] = teas;
+
+                    gatherings = currentGatherings;
+                    await sendToSheet('gathering_update', gatherings);
+                    
+                    renderTracker();
+                    renderGatherings();
+                    renderMemberSummaries();
+                    closeRecordModal();
+                    showToast(`${member}님의 기록이 저장되었습니다 🍵`);
+                }
+            } catch (err) {
+                console.error("기록 저장 중 오류 발생", err);
+                showToast("저장 중 오류가 발생했습니다.");
             }
         }
 
