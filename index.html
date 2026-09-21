@@ -215,15 +215,16 @@
         </div>
     </nav>
 
-    <!-- Modal 1: Gathering (닫기 버튼 위치 고정 수정 완료) -->
+    <!-- Modal 1: Gathering (카드 등록 / 수정) -->
     <div id="gathering-modal" class="modal-bg hidden">
         <div class="modal-content">
             <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: space-between; background: #F5F2EC;">
-                <h3 style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 카드 등록하기</h3>
+                <h3 id="gathering-modal-title" style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 카드 등록하기</h3>
                 <button onclick="closeGatheringModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61; padding: 4px;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="padding: 20px; overflow-y: auto;">
                 <form id="gathering-form" onsubmit="saveGatheringCard(event)" style="display: flex; flex-direction: column; gap: 12px;">
+                    <input type="hidden" id="g-id">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
                             <label class="form-label">모임 날짜 *</label>
@@ -270,18 +271,18 @@
                         <input type="text" id="g-description" placeholder="예: 센차와 화과자가 유명한 곳" class="form-input">
                     </div>
                     <div style="margin-top: 8px;">
-                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; border-radius: 12px;">찻자리 카드 생성하기</button>
+                        <button type="submit" id="gathering-submit-btn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; border-radius: 12px;">찻자리 카드 생성하기</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Modal 2: Record -->
+    <!-- Modal 2: Record (기록 등록 / 수정) -->
     <div id="record-modal" class="modal-bg hidden">
         <div class="modal-content">
             <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: space-between; background: #F5F2EC;">
-                <h3 style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 기록 남기기</h3>
+                <h3 id="record-modal-title" style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 기록 남기기</h3>
                 <button onclick="closeRecordModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61; padding: 4px;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="padding: 20px; overflow-y: auto;">
@@ -309,7 +310,7 @@
                         <div id="modal-tea-items-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
                     </div>
                     <div style="margin-top: 8px;">
-                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; border-radius: 12px;">내 기록 저장하기</button>
+                        <button type="submit" id="record-submit-btn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; border-radius: 12px;">내 기록 저장하기</button>
                     </div>
                 </form>
             </div>
@@ -336,6 +337,7 @@
 
         let gatherings = [];
         let memberExpandedState = {};
+        let editingRecordTarget = null; // { gatheringId, member }
 
         window.onload = async function() {
             await loadFromGoogleSheet();
@@ -389,15 +391,10 @@
                 const serverData = await res.json();
                 let currentGatherings = serverData.gatherings || [];
 
-                if (type === 'gathering') {
-                    currentGatherings.unshift(payload);
-                } else if (type === 'gathering_update' || type === 'record') {
-                    currentGatherings = payload;
-                }
-
+                // 항상 전체 최신 gatherings 배열을 서버와 동기화하여 전송 (데이터 유실 방지)
                 await fetch(API_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ type: 'gathering', payload: currentGatherings })
+                    body: JSON.stringify({ type: 'gathering', payload: payload })
                 });
             } catch (e) {
                 showToast("서버 전송 중 오류 발생");
@@ -430,7 +427,34 @@
                 return;
             }
             document.getElementById('gathering-form').reset();
+            document.getElementById('g-id').value = '';
+            document.getElementById('gathering-modal-title').textContent = "찻자리 카드 등록하기";
+            document.getElementById('gathering-submit-btn').textContent = "찻자리 카드 생성하기";
             document.getElementById('g-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('gathering-modal').classList.remove('hidden');
+        }
+
+        function editGathering(id) {
+            const password = prompt("멤버 전용 비밀번호를 입력해주세요:");
+            if (password !== MEMBER_PASSWORD) {
+                if (password !== null) showToast("비밀번호가 틀렸습니다.");
+                return;
+            }
+            const g = gatherings.find(item => item.id === id);
+            if (!g) return;
+
+            document.getElementById('gathering-form').reset();
+            document.getElementById('g-id').value = g.id;
+            document.getElementById('g-date').value = g.date;
+            document.getElementById('g-weather').value = g.weather || "☀️ 맑음";
+            document.getElementById('g-teahouse').value = g.teahouse;
+            document.getElementById('g-region').value = g.region;
+            document.getElementById('g-theme').value = g.theme || "";
+            document.getElementById('g-manager').value = g.manager || "경민";
+            document.getElementById('g-description').value = g.description || "";
+
+            document.getElementById('gathering-modal-title').textContent = "찻자리 카드 수정하기";
+            document.getElementById('gathering-submit-btn').textContent = "찻자리 카드 수정 완료";
             document.getElementById('gathering-modal').classList.remove('hidden');
         }
 
@@ -438,25 +462,39 @@
 
         async function saveGatheringCard(e) {
             e.preventDefault();
-            const newGathering = {
-                id: 'g_' + Date.now(),
-                date: document.getElementById('g-date').value,
-                weather: document.getElementById('g-weather').value,
-                teahouse: document.getElementById('g-teahouse').value,
-                region: document.getElementById('g-region').value,
-                theme: document.getElementById('g-theme').value,
-                manager: document.getElementById('g-manager').value,
-                description: document.getElementById('g-description').value,
-                memberRecords: {}
-            };
-            gatherings.unshift(newGathering);
-            await sendToSheet('gathering', newGathering);
+            const id = document.getElementById('g-id').value;
+            const date = document.getElementById('g-date').value;
+            const weather = document.getElementById('g-weather').value;
+            const teahouse = document.getElementById('g-teahouse').value;
+            const region = document.getElementById('g-region').value;
+            const theme = document.getElementById('g-theme').value;
+            const manager = document.getElementById('g-manager').value;
+            const description = document.getElementById('g-description').value;
+
+            if (id) {
+                const idx = gatherings.findIndex(item => item.id === id);
+                if (idx !== -1) {
+                    gatherings[idx] = {
+                        ...gatherings[idx],
+                        date, weather, teahouse, region, theme, manager, description
+                    };
+                }
+            } else {
+                const newGathering = {
+                    id: 'g_' + Date.now(),
+                    date, weather, teahouse, region, theme, manager, description,
+                    memberRecords: {}
+                };
+                gatherings.unshift(newGathering);
+            }
+
+            await sendToSheet('gathering_update', gatherings);
             renderTracker(); renderGatherings(); renderMemberSummaries();
             closeGatheringModal();
-            showToast("찻자리 카드 생성 완료 🍵");
+            showToast(id ? "찻자리 카드 수정 완료 🍵" : "찻자리 카드 생성 완료 🍵");
         }
 
-        function openRecordModal() {
+        function openRecordModal(targetGatheringId = null, targetMember = null) {
             if (gatherings.length === 0) {
                 showToast("등록된 찻자리가 없습니다!");
                 return;
@@ -466,7 +504,11 @@
                 if (password !== null) showToast("비밀번호가 틀렸습니다.");
                 return;
             }
+
+            editingRecordTarget = (targetGatheringId && targetMember) ? { gatheringId: targetGatheringId, member: targetMember } : null;
+
             const selectEl = document.getElementById('rec-gathering-id');
+            const memberSelect = document.getElementById('rec-member');
             selectEl.innerHTML = '';
             gatherings.forEach(g => {
                 const opt = document.createElement('option');
@@ -474,8 +516,40 @@
                 opt.textContent = `[${g.date}] ${g.teahouse} (${g.region})`;
                 selectEl.appendChild(opt);
             });
+
+            if (targetGatheringId) selectEl.value = targetGatheringId;
+            if (targetMember) memberSelect.value = targetMember;
+
+            if (editingRecordTarget) {
+                selectEl.disabled = true;
+                memberSelect.disabled = true;
+                document.getElementById('record-modal-title').textContent = `${targetMember}님의 기록 수정하기`;
+                document.getElementById('record-submit-btn').textContent = "기록 수정 완료";
+            } else {
+                selectEl.disabled = false;
+                memberSelect.disabled = false;
+                document.getElementById('record-modal-title').textContent = "찻자리 기록 남기기";
+                document.getElementById('record-submit-btn').textContent = "내 기록 저장하기";
+            }
+
             document.getElementById('modal-tea-items-container').innerHTML = '';
-            addModalTeaItem();
+
+            if (editingRecordTarget) {
+                const g = gatherings.find(item => item.id === targetGatheringId);
+                if (g && g.memberRecords && g.memberRecords[targetMember]) {
+                    const existingTeas = Array.isArray(g.memberRecords[targetMember]) ? g.memberRecords[targetMember] : [g.memberRecords[targetMember]];
+                    if (existingTeas.length > 0) {
+                        existingTeas.forEach(t => addModalTeaItem(t));
+                    } else {
+                        addModalTeaItem();
+                    }
+                } else {
+                    addModalTeaItem();
+                }
+            } else {
+                addModalTeaItem();
+            }
+
             document.getElementById('record-modal').classList.remove('hidden');
         }
 
@@ -558,8 +632,8 @@
 
         async function saveMemberRecords(e) {
             e.preventDefault();
-            const gatheringId = document.getElementById('rec-gathering-id').value;
-            const member = document.getElementById('rec-member').value;
+            const gatheringId = editingRecordTarget ? editingRecordTarget.gatheringId : document.getElementById('rec-gathering-id').value;
+            const member = editingRecordTarget ? editingRecordTarget.member : document.getElementById('rec-member').value;
 
             const teaItems = document.querySelectorAll('#modal-tea-items-container > div');
             const newTeas = [];
@@ -584,18 +658,21 @@
                 if (gathering) {
                     if (!gathering.memberRecords) gathering.memberRecords = {};
                     
-                    // 기존 기록이 배열 형태가 아니거나 없으면 초기화 후 누적, 이미 있으면 기존 기록에 새로운 차 항목을 이어붙임(push)
-                    if (!Array.isArray(gathering.memberRecords[member])) {
-                        gathering.memberRecords[member] = [];
+                    if (editingRecordTarget) {
+                        gathering.memberRecords[member] = newTeas;
+                    } else {
+                        if (!Array.isArray(gathering.memberRecords[member])) {
+                            gathering.memberRecords[member] = [];
+                        }
+                        gathering.memberRecords[member].push(...newTeas);
                     }
-                    gathering.memberRecords[member].push(...newTeas);
 
                     gatherings = currentGatherings;
                     await sendToSheet('gathering_update', gatherings);
                     
                     renderTracker(); renderGatherings(); renderMemberSummaries();
                     closeRecordModal();
-                    showToast(`${member}님 기록 추가 완료 🍵`);
+                    showToast(`${member}님 기록 ${editingRecordTarget ? '수정' : '추가'} 완료 🍵`);
                 }
             } catch (err) {
                 showToast("저장 중 오류 발생");
@@ -624,9 +701,8 @@
                 let allTeas = [];
                 gatherings.forEach(g => {
                     if (g.memberRecords && g.memberRecords[member]) {
-                        // memberRecords[member]가 배열인 경우 모두 추출
                         const records = Array.isArray(g.memberRecords[member]) ? g.memberRecords[member] : [g.memberRecords[member]];
-                        records.forEach(t => allTeas.push({ ...t, teahouse: g.teahouse }));
+                        records.forEach(t => allTeas.push({ ...t, teahouse: g.teahouse, gatheringId: g.id }));
                     }
                 });
 
@@ -643,7 +719,10 @@
                                     <span style="font-weight:bold; color:#4E433C;">${t.name}</span>
                                     <span style="font-size:10px; color:#8C8279; background:white; padding:1px 4px; border-radius:4px; border:1px solid #EFECE6;">${t.type}</span>
                                 </div>
-                                <span style="font-size:10px; color:#8C8279;">${t.teahouse}</span>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span style="font-size:10px; color:#8C8279;">${t.teahouse}</span>
+                                    <button onclick="openRecordModal('${t.gatheringId}', '${member}')" style="background:none; border:none; color:#79553D; font-size:10px; font-weight:600; cursor:pointer;" title="기록 수정"><i class="fa-solid fa-pen"></i> 수정</button>
+                                </div>
                             </div>
                             <div style="font-size:11px; color:#79553D; font-weight:500; background:rgba(255,255,255,0.7); padding:4px 6px; border-radius:4px; margin-bottom:4px;">
                                 🌿 향과 맛: ${t.flavor}
@@ -742,7 +821,10 @@
                                 <span style="font-size:10px; color:#736A61;">${g.weather || ''}</span>
                                 <span style="font-size:10px; color:#736A61; background:rgba(255,255,255,0.6); padding:2px 6px; border-radius:4px;">📍 ${g.region}</span>
                             </div>
-                            <button onclick="deleteGathering('${g.id}')" style="background:none; border:none; color:#A89F91; cursor:pointer;" title="삭제"><i class="fa-solid fa-trash-can"></i></button>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <button onclick="editGathering('${g.id}')" style="background:none; border:none; color:#736A61; cursor:pointer; padding: 2px 4px;" title="카드 수정"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteGathering('${g.id}')" style="background:none; border:none; color:#A89F91; cursor:pointer; padding: 2px 4px;" title="카드 삭제"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <h3 style="font-size:14px; font-weight:bold; color:#3C3633; display:flex; align-items:center; gap:6px;">
