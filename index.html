@@ -12,14 +12,16 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
-            background-color: #FBF9F5;
-            color: #3C3633;
+            background-color: #FBF9F5; /* 웜 아이보리 배경 */
+            color: #3C3633; /* 딥 차콜 텍스트 */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            max-width: 440px; /* 모바일 뷰포트 최우선 고려 */
+            margin: 0 auto;
         }
         header {
-            background-color: #EFECE6;
+            background-color: #F5F2EC; /* 라이트 베이지 */
             border-bottom: 1px solid #E3DFD5;
             position: sticky;
             top: 0;
@@ -42,32 +44,43 @@
         .btn {
             border: none;
             cursor: pointer;
-            border-radius: 9999px;
+            border-radius: 9999px; /* 완전한 알약형 */
             padding: 8px 12px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
             display: inline-flex;
             align-items: center;
             gap: 4px;
             transition: background 0.2s;
+            min-height: 36px;
         }
-        .btn-primary { background-color: #79553D; color: white; }
-        .btn-primary:hover { background-color: #624430; }
-        .btn-secondary { background-color: #EAE4D8; color: #5C524B; }
-        .btn-secondary:hover { background-color: #DED7C8; }
+        .btn-primary { 
+            background-color: #79553D; /* 딥 우드 브라운 */
+            color: white; 
+        }
+        .btn-primary:hover { 
+            background-color: #624430; /* 다크 우드 Hover */
+        }
+        .btn-secondary { 
+            background-color: #EAE4D8; 
+            color: #5C524B; 
+        }
+        .btn-secondary:hover { 
+            background-color: #DED7C8; 
+        }
 
         .card {
-            background: white;
-            border: 1px solid #E8E2D5;
-            border-radius: 16px;
+            background: #FFFFFF; /* 카드 기본 배경 */
+            border: 1px solid #E8E2D5; /* 소프트 보더 */
+            border-radius: 20px; /* 16px~24px 부드러운 모서리 */
             padding: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02); /* 미세한 그림자 */
             margin-bottom: 16px;
         }
         .card-sub {
-            background: #F5F2EC;
+            background: #F5F2EC; /* 라이트 베이지 서브 카드 */
             border: 1px solid #E8E2D5;
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 16px;
             margin-bottom: 16px;
         }
@@ -89,12 +102,14 @@
         }
         .teacup-box.filled {
             background: rgba(243, 198, 143, 0.3);
-            border-color: #D8A462;
+            border-color: #79553D;
         }
 
         nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
+            max-width: 440px;
+            margin: 0 auto;
             background: #FBF9F5;
             border-top: 1px solid #E3DFD5;
             padding: 10px 24px;
@@ -103,7 +118,9 @@
         nav button {
             background: none; border: none; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; gap: 4px;
-            font-size: 11px; color: #A89F91; font-weight: 500;
+            font-size: 10px; color: #A89F91; font-weight: 500;
+            min-height: 44px; /* 모바일 터치 영역 확보 */
+            justify-content: center;
         }
         nav button.active { color: #79553D; }
 
@@ -112,26 +129,22 @@
             z-index: 50; display: flex; align-items: flex-end; justify-content: center;
         }
         .modal-content {
-            background: #FBF9F5; width: 100%; max-width: 500px;
+            background: #FBF9F5; width: 100%; max-width: 440px;
             max-height: 90vh; border-radius: 24px 24px 0 0; overflow-y: auto;
             display: flex; flex-direction: column;
-        }
-        @media (min-width: 640px) {
-            .modal-bg { align-items: center; padding: 16px; }
-            .modal-content { border-radius: 16px; }
         }
 
         .form-input, .form-select {
             width: 100%; font-size: 12px; padding: 8px 12px;
-            background: white; border: 1px solid #E3DFD5; border-radius: 8px;
-            outline: none; margin-top: 4px;
+            background: white; border: 1px solid #E3DFD5; border-radius: 10px;
+            outline: none; margin-top: 4px; min-height: 40px;
         }
-        .form-label { font-size: 11px; font-weight: 500; color: #685D54; display: block; }
+        .form-label { font-size: 11px; font-weight: 600; color: #5C524B; display: block; }
         .hidden { display: none !important; }
         
         #toast {
             position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
-            background: #3C3633; color: white; font-size: 12px; padding: 10px 16px;
+            background: #3C3633; color: white; font-size: 11px; padding: 10px 16px;
             border-radius: 9999px; opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 60;
         }
         #toast.show { opacity: 1; }
@@ -141,11 +154,11 @@
 
     <!-- Header -->
     <header>
-        <div class="container" style="padding:0; margin:0 auto; display:flex; justify-content:space-between; align-items:center; max-width:440px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
             <div class="flex items-center" style="gap: 8px;">
                 <span style="font-size: 20px;">🍵</span>
                 <div>
-                    <h1 style="font-size: 15px; font-weight: bold; color: #5C524B; line-height: 1.2;">티크크</h1>
+                    <h1 style="font-size: 14px; font-weight: bold; color: #3C3633; line-height: 1.2;">티크크</h1>
                     <p style="font-size: 10px; color: #8C8279;">함께 마신 차를 기록해요</p>
                 </div>
             </div>
@@ -168,7 +181,7 @@
         <div id="tab-home" class="space-y-4">
             <section class="card-sub">
                 <div class="flex items-center justify-between" style="margin-bottom: 8px;">
-                    <h3 style="font-size: 12px; font-weight: 600; color: #79553D; text-transform: uppercase;">찻잔 달력</h3>
+                    <h3 style="font-size: 12px; font-weight: 700; color: #79553D; text-transform: uppercase;">찻잔 달력</h3>
                     <span id="tracker-count-label" style="font-size: 10px; color: #8C8279;">0 / 12</span>
                 </div>
                 <p style="font-size: 11px; color: #736A61; margin-bottom: 12px;">찻자리 카드 등록하고 달력 채우기 도전</p>
@@ -177,7 +190,7 @@
 
             <div style="display: flex; flex-direction: column; gap: 12px;">
                 <div class="flex items-center justify-between" style="padding: 0 4px;">
-                    <h3 style="font-size: 12px; font-weight: 600; color: #79553D; text-transform: uppercase;">찻자리 카드 목록</h3>
+                    <h3 style="font-size: 12px; font-weight: 700; color: #79553D; text-transform: uppercase;">찻자리 카드 목록</h3>
                     <span id="gathering-count" style="font-size: 10px; color: #8C8279;">총 0개</span>
                 </div>
                 <div id="gatherings-container" style="display: flex; flex-direction: column; gap: 16px;"></div>
@@ -187,8 +200,8 @@
         <!-- Log Tab -->
         <div id="tab-log" class="space-y-4 hidden">
             <div class="card-sub" style="text-align: center;">
-                <h2 style="font-size: 14px; font-weight: 600; color: #4E433C;">찻자리 아카이빙</h2>
-                <p style="font-size: 12px; color: #736A61; margin-top: 4px;">각자 기록한 찻자리 노트를 볼 수 있어요</p>
+                <h2 style="font-size: 13px; font-weight: 700; color: #3C3633;">찻자리 아카이빙</h2>
+                <p style="font-size: 11px; color: #736A61; margin-top: 4px;">각자 기록한 찻자리 노트를 볼 수 있어요</p>
             </div>
             <div id="member-summary-cards" style="display: flex; flex-direction: column; gap: 12px;"></div>
         </div>
@@ -196,14 +209,14 @@
         <!-- Empty State -->
         <div id="empty-state" class="hidden" style="text-align: center; padding: 64px 16px;">
             <div style="font-size: 36px; margin-bottom: 12px;">🫖</div>
-            <p style="font-size: 15px; color: #5C524B; font-weight: bold; margin-bottom: 4px;">아직 등록된 찻자리가 없어요</p>
-            <p style="font-size: 12px; color: #8C8279;">상단 '카드 등록' 버튼을 눌러 모임을 먼저 생성해보세요!</p>
+            <p style="font-size: 13px; color: #3C3633; font-weight: bold; margin-bottom: 4px;">아직 등록된 찻자리가 없어요</p>
+            <p style="font-size: 11px; color: #8C8279;">상단 '카드 등록' 버튼을 눌러 모임을 먼저 생성해보세요!</p>
         </div>
     </main>
 
     <!-- Navigation Bar -->
     <nav>
-        <div style="max-width: 440px; margin: 0 auto; display: flex; justify-content: space-around; align-items: center;">
+        <div style="display: flex; justify-content: space-around; align-items: center;">
             <button onclick="switchTab('home')" id="nav-btn-home" class="active">
                 <i class="fa-solid fa-house" style="font-size: 16px;"></i>
                 <span>홈</span>
@@ -219,7 +232,7 @@
     <div id="gathering-modal" class="modal-bg hidden">
         <div class="modal-content">
             <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: space-between; background: #F5F2EC;">
-                <h3 id="gathering-modal-title" style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 카드 등록하기</h3>
+                <h3 id="gathering-modal-title" style="font-size: 13px; font-weight: bold; color: #3C3633;">찻자리 카드 등록하기</h3>
                 <button onclick="closeGatheringModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61; padding: 4px;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="padding: 20px; overflow-y: auto;">
@@ -282,7 +295,7 @@
     <div id="record-modal" class="modal-bg hidden">
         <div class="modal-content">
             <div style="padding: 16px 20px; border-bottom: 1px solid #E8E2D5; display: flex; align-items: center; justify-content: space-between; background: #F5F2EC;">
-                <h3 id="record-modal-title" style="font-size: 13px; font-weight: bold; color: #4E433C;">찻자리 기록 남기기</h3>
+                <h3 id="record-modal-title" style="font-size: 13px; font-weight: bold; color: #3C3633;">찻자리 기록 남기기</h3>
                 <button onclick="closeRecordModal()" style="background:none; border:none; cursor:pointer; font-size:16px; color:#736A61; padding: 4px;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="padding: 20px; overflow-y: auto;">
@@ -337,7 +350,7 @@
 
         let gatherings = [];
         let memberExpandedState = {};
-        let editingRecordTarget = null; // { gatheringId, member }
+        let editingRecordTarget = null;
 
         window.onload = async function() {
             await loadFromGoogleSheet();
@@ -387,11 +400,6 @@
 
         async function sendToSheet(type, payload) {
             try {
-                const res = await fetch(API_URL);
-                const serverData = await res.json();
-                let currentGatherings = serverData.gatherings || [];
-
-                // 항상 전체 최신 gatherings 배열을 서버와 동기화하여 전송 (데이터 유실 방지)
                 await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ type: 'gathering', payload: payload })
@@ -559,7 +567,7 @@
             const container = document.getElementById('modal-tea-items-container');
             const idx = container.children.length;
             const itemDiv = document.createElement('div');
-            itemDiv.style.cssText = "background: #FBF9F5; padding: 12px; border-radius: 8px; border: 1px solid #E3DFD5; display: flex; flex-direction: column; gap: 8px;";
+            itemDiv.style.cssText = "background: #FBF9F5; padding: 12px; border-radius: 10px; border: 1px solid #E3DFD5; display: flex; flex-direction: column; gap: 8px;";
             
             let typeOptions = TEA_TYPES.map(t => `<option value="${t}" ${data.type === t ? 'selected' : ''}>${t}</option>`).join('');
             let colorButtonsHTML = '';
@@ -576,7 +584,7 @@
             itemDiv.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 10px; font-weight: bold; color: #8C8279;">차 항목 #${idx + 1}</span>
-                    ${idx > 0 ? `<button type="button" onclick="this.closest('div').parentElement.remove()" style="background:none; border:none; color:red; font-size:11px; cursor:pointer;"><i class="fa-solid fa-trash-can"></i> 삭제</button>` : ''}
+                    ${idx > 0 ? `<button type="button" onclick="this.closest('div').parentElement.remove()" style="background:none; border:none; color:#D97757; font-size:11px; cursor:pointer;"><i class="fa-solid fa-trash-can"></i> 삭제</button>` : ''}
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <div>
@@ -590,7 +598,7 @@
                 </div>
                 <div>
                     <label class="form-label" style="font-size:10px; margin-bottom:4px;">수색 선택</label>
-                    <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 6px 10px; border-radius: 6px; border: 1px solid #E3DFD5;">
+                    <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 6px 10px; border-radius: 8px; border: 1px solid #E3DFD5;">
                         <div style="display: flex; gap: 6px;">${colorButtonsHTML}</div>
                         <input type="hidden" name="tea-color-hex" value="${data.colorHex || '#F3C68F'}">
                         <input type="hidden" name="tea-color-name" value="${data.colorName || '따뜻한 호박색'}">
@@ -712,19 +720,19 @@
 
                 displayTeas.forEach(t => {
                     teaHTML += `
-                        <div style="background: #FBF9F5; padding: 10px; border-radius: 8px; border: 1px solid #E3DFD5; font-size: 12px; margin-bottom: 6px;">
+                        <div style="background: #FBF9F5; padding: 10px; border-radius: 10px; border: 1px solid #E3DFD5; font-size: 11px; margin-bottom: 6px;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                                 <div style="display:flex; align-items:center; gap:6px;">
                                     <span style="width:10px; height:10px; border-radius:50%; background:${t.colorHex || '#F3C68F'}; display:inline-block;"></span>
-                                    <span style="font-weight:bold; color:#4E433C;">${t.name}</span>
+                                    <span style="font-weight:bold; color:#3C3633;">${t.name}</span>
                                     <span style="font-size:10px; color:#8C8279; background:white; padding:1px 4px; border-radius:4px; border:1px solid #EFECE6;">${t.type}</span>
                                 </div>
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     <span style="font-size:10px; color:#8C8279;">${t.teahouse}</span>
-                                    <button onclick="openRecordModal('${t.gatheringId}', '${member}')" style="background:none; border:none; color:#79553D; font-size:10px; font-weight:600; cursor:pointer;" title="기록 수정"><i class="fa-solid fa-pen"></i> 수정</button>
+                                    <button onclick="openRecordModal('${t.gatheringId}', '${member}')" style="background:none; border:none; color:#79553D; font-size:10px; font-weight:600; cursor:pointer;"><i class="fa-solid fa-pen"></i> 수정</button>
                                 </div>
                             </div>
-                            <div style="font-size:11px; color:#79553D; font-weight:500; background:rgba(255,255,255,0.7); padding:4px 6px; border-radius:4px; margin-bottom:4px;">
+                            <div style="font-size:11px; color:#79553D; font-weight:500; background:rgba(255,255,255,0.7); padding:4px 6px; border-radius:6px; margin-bottom:4px;">
                                 🌿 향과 맛: ${t.flavor}
                             </div>
                             ${t.snack ? `<div style="font-size:10px; color:#736A61;">🍡 다과: ${t.snack}</div>` : ''}
@@ -735,15 +743,15 @@
                 const card = document.createElement('div');
                 card.className = "card";
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #F1EFE7; padding-bottom:8px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E8E2D5; padding-bottom:8px; margin-bottom:10px;">
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="width:24px; height:24px; border-radius:50%; background:#79553D; color:white; font-size:11px; font-weight:bold; display:flex; align-items:center; justify-content:center;">${member.slice(0, 1)}</span>
-                            <h4 style="font-size:12px; font-weight:bold; color:#4E433C;">${member}의 마신 차 리스트</h4>
+                            <span style="width:24px; height:24px; border-radius:50%; background:#79553D; color:white; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center;">${member.slice(0, 1)}</span>
+                            <h4 style="font-size:12px; font-weight:bold; color:#3C3633;">${member}의 마신 차 리스트</h4>
                         </div>
                         <span style="font-size:10px; background:#F5F2EC; color:#79553D; padding:2px 8px; border-radius:99px; font-weight:600;">총 ${allTeas.length}잔</span>
                     </div>
                     <div>${teaHTML}</div>
-                    ${allTeas.length > 3 ? `<button onclick="toggleMemberExpand('${member}')" style="width:100\%; font-size:11px; color:#79553D; font-weight:500; padding:8px; background:#F5F2EC; border:none; border-radius:6px; cursor:pointer; margin-top:4px;">${isExpanded ? '접기 ∧' : `+ 더보기 (전체 ${allTeas.length}개 보기) ∨`}</button>` : ''}
+                    ${allTeas.length > 3 ? `<button onclick="toggleMemberExpand('${member}')" style="width:100\%; font-size:11px; color:#79553D; font-weight:500; padding:8px; background:#F5F2EC; border:none; border-radius:8px; cursor:pointer; margin-top:4px;">${isExpanded ? '접기 ∧' : `+ 더보기 (전체 ${allTeas.length}개 보기) ∨`}</button>` : ''}
                 `;
                 container.appendChild(card);
             });
@@ -800,12 +808,12 @@
                             entriesHTML += `<div style="font-size:11px; color:#5C524B; padding:2px 0;"><span style="font-weight:bold; color:#79553D;">[${e.member}]</span> 향과 맛: ${e.flavor}</div>`;
                         });
                         teaGroupsHTML += `
-                            <div style="background:#FBF9F5; padding:10px; border-radius:8px; border:1px solid #E3DFD5; margin-bottom:8px;">
-                                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #F1EFE7; padding-bottom:4px; margin-bottom:4px;">
+                            <div style="background:#FBF9F5; padding:10px; border-radius:10px; border:1px solid #E3DFD5; margin-bottom:8px;">
+                                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #E8E2D5; padding-bottom:4px; margin-bottom:4px;">
                                     <div style="display:flex; align-items:center; gap:6px;">
                                         <div style="display:flex; gap:2px;">${colorCircles}</div>
                                         <span style="font-weight:bold; font-size:12px; color:#3C3633;">${teaName}</span>
-                                        <span style="font-size:10px; color:#8C8279; background:white; padding:1px 4px; border-radius:4px;">${info.type}</span>
+                                        <span style="font-size:10px; color:#8C8279; background:white; padding:1px 4px; border-radius:4px; border:1px solid #E3DFD5;">${info.type}</span>
                                     </div>
                                 </div>
                                 <div>${entriesHTML}</div>
@@ -817,23 +825,23 @@
                     <div style="background:#F5F2EC; padding:12px 16px; border-bottom:1px solid #E8E2D5;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                             <div style="display:flex; align-items:center; gap:6px;">
-                                <span style="font-size:10px; font-weight:600; color:#79553D; background:white; padding:2px 6px; border-radius:4px; border:1px solid #E3DFD5;">${formattedDate}</span>
+                                <span style="font-size:10px; font-weight:600; color:#79553D; background:white; padding:2px 6px; border-radius:6px; border:1px solid #E3DFD5;">${formattedDate}</span>
                                 <span style="font-size:10px; color:#736A61;">${g.weather || ''}</span>
-                                <span style="font-size:10px; color:#736A61; background:rgba(255,255,255,0.6); padding:2px 6px; border-radius:4px;">📍 ${g.region}</span>
+                                <span style="font-size:10px; color:#736A61; background:rgba(255,255,255,0.6); padding:2px 6px; border-radius:6px;">📍 ${g.region}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 4px;">
-                                <button onclick="editGathering('${g.id}')" style="background:none; border:none; color:#736A61; cursor:pointer; padding: 2px 4px;" title="카드 수정"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteGathering('${g.id}')" style="background:none; border:none; color:#A89F91; cursor:pointer; padding: 2px 4px;" title="카드 삭제"><i class="fa-solid fa-trash-can"></i></button>
+                                <button onclick="editGathering('${g.id}')" style="background:none; border:none; color:#736A61; cursor:pointer; padding: 2px 4px;"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteGathering('${g.id}')" style="background:none; border:none; color:#A89F91; cursor:pointer; padding: 2px 4px;"><i class="fa-solid fa-trash-can"></i></button>
                             </div>
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h3 style="font-size:14px; font-weight:bold; color:#3C3633; display:flex; align-items:center; gap:6px;">
+                            <h3 style="font-size:13px; font-weight:bold; color:#3C3633; display:flex; align-items:center; gap:6px;">
                                 <i class="fa-solid fa-mug-hot" style="color:#79553D; font-size:12px;"></i>
                                 <span>${g.teahouse}</span>
                             </h3>
                             ${g.theme ? `<span style="font-size:10px; font-weight:500; color:#5C524B; background:#EFECE6; padding:2px 8px; border-radius:99px;"># ${g.theme}</span>` : ''}
                         </div>
-                        ${g.description ? `<p style="font-size:11px; color:#685D54; margin-top:6px; background:white; padding:6px 8px; border-radius:6px; border:1px solid #E8E2D5; font-style:italic;">💡 ${g.description}</p>` : ''}
+                        ${g.description ? `<p style="font-size:11px; color:#685D54; margin-top:6px; background:white; padding:6px 8px; border-radius:8px; border:1px solid #E8E2D5; font-style:italic;">💡 ${g.description}</p>` : ''}
                         <div style="font-size:10px; color:#8C8279; margin-top:6px;">담당자: ${g.manager || '경민'}</div>
                     </div>
                     <div style="padding: 12px 16px;">${teaGroupsHTML}</div>
