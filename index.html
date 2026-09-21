@@ -340,10 +340,10 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbyHll6QgzCJTbkRMP1QSt3yL7MVA90RVfUGUXNdFgeMyThd8mwk7EW_ofn4VHM3Rl1C/exec";
         const MEMBERS = ["경민", "다인", "다은", "보현"];
         const MEMBER_ICONS = {
-            "경민": "🐶",
-            "다인": "🐱",
-            "다은": "🐰",
-            "보현": "🦊"
+            "경민": "🐻",
+            "다인": "🐰",
+            "다은": "🦊",
+            "보현": "🐱"
         };
         const TEA_TYPES = ["녹차", "홍차", "우롱차", "흑차", "백차", "황차", "허브티/블렌디드", "말차", "티음료"];
         const MEMBER_PASSWORD = "duck2026";
@@ -741,10 +741,10 @@
                                 </div>
                             </div>
                             <div style="font-size:11px; color:#79553D; font-weight:500; background:rgba(255,255,255,0.7); padding:4px 6px; border-radius:6px; margin-bottom:4px;">
-                                🌿 향과 맛: ${t.flavor}
+                                향과 맛: ${t.flavor}
                             </div>
-                            ${t.snack ? `<div style="font-size:10px; color:#736A61;">🍡 다과: ${t.snack}</div>` : ''}
-                            ${t.memo ? `<div style="font-size:10px; color:#685D54; margin-top:2px;">💭 메모: ${t.memo}</div>` : ''}
+                            ${t.snack ? `<div style="font-size:10px; color:#736A61;">다과: ${t.snack}</div>` : ''}
+                            ${t.memo ? `<div style="font-size:10px; color:#685D54; margin-top:2px;">메모: ${t.memo}</div>` : ''}
                         </div>`;
                 });
 
@@ -753,7 +753,7 @@
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E8E2D5; padding-bottom:8px; margin-bottom:10px;">
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <span style="width:24px; height:24px; border-radius:50%; background:#79553D; color:white; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center;">${member.slice(0, 1)}</span>
+                            <span style="font-size: 16px;">${MEMBER_ICONS[member] || '🍵'}</span>
                             <h4 style="font-size:12px; font-weight:bold; color:#3C3633;">${member} 차 노트</h4>
                         </div>
                         <span style="font-size:10px; background:#F5F2EC; color:#79553D; padding:2px 8px; border-radius:99px; font-weight:600;">총 ${allTeas.length}잔</span>
@@ -849,7 +849,7 @@
                             </h3>
                             ${g.theme ? `<span style="font-size:10px; font-weight:500; color:#5C524B; background:#EFECE6; padding:2px 8px; border-radius:99px;"># ${g.theme}</span>` : ''}
                         </div>
-                        ${g.description ? `<p style="font-size:11px; color:#685D54; margin-top:6px; background:white; padding:6px 8px; border-radius:8px; border:1px solid #E8E2D5;">💡 ${g.description}</p>` : ''}
+                        ${g.description ? `<p style="font-size:11px; color:#685D54; margin-top:6px; background:white; padding:6px 8px; border-radius:8px; border:1px solid #E8E2D5;">${g.description}</p>` : ''}
                         <div style="font-size:10px; color:#8C8279; margin-top:6px;">담당자: ${g.manager || '경민'}</div>
                     </div>
                     <div style="padding: 12px 16px;">${teaGroupsHTML}</div>
