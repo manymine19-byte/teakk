@@ -83,7 +83,6 @@
             border-radius: 20px;
             padding: 16px;
             margin-bottom: 16px;
-            position: relative; /* 프레임 상단 타이틀 배치를 위해 추가 */
         }
         
         .grid-6 {
@@ -180,15 +179,16 @@
     <main class="container space-y-4">
         <!-- Home Tab -->
         <div id="tab-home" class="space-y-4">
-            <section class="card-sub" style="padding-top: 24px;">
-                <div style="position: absolute; top: -10px; left: 20px; background: #79553D; color: white; padding: 2px 10px; border-radius: 99px; font-size: 10px; font-weight: 700;">찻잔 달력</div>
-                <div class="flex items-center justify-between" style="margin-bottom: 8px;">
-                    <h3 style="font-size: 12px; font-weight: 700; color: #79553D; text-transform: uppercase; opacity: 0;">찻잔 달력</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="flex items-center justify-between" style="padding: 0 4px;">
+                    <h3 style="font-size: 12px; font-weight: 700; color: #79553D; text-transform: uppercase;">찻잔 달력</h3>
                     <span id="tracker-count-label" style="font-size: 10px; color: #8C8279;">0 / 12</span>
                 </div>
-                <p style="font-size: 11px; color: #736A61; margin-bottom: 12px;">찻자리 카드 등록하고 달력 채우기 도전</p>
-                <div id="teacups-grid" class="grid-6"></div>
-            </section>
+                <section class="card-sub" style="margin-bottom: 0;">
+                    <p style="font-size: 11px; color: #736A61; margin-bottom: 12px;">찻자리 카드 등록하고 달력 채우기 도전</p>
+                    <div id="teacups-grid" class="grid-6"></div>
+                </section>
+            </div>
 
             <div style="display: flex; flex-direction: column; gap: 12px;">
                 <div class="flex items-center justify-between" style="padding: 0 4px;">
