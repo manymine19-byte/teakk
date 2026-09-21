@@ -179,7 +179,7 @@
     <main class="container space-y-4">
         <!-- Home Tab -->
         <div id="tab-home" class="space-y-4">
-            <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
                 <div class="flex items-center justify-between" style="padding: 0 4px;">
                     <h3 style="font-size: 12px; font-weight: 700; color: #79553D; text-transform: uppercase;">찻잔 달력</h3>
                     <span id="tracker-count-label" style="font-size: 10px; color: #8C8279;">0 / 12</span>
@@ -190,7 +190,7 @@
                 </section>
             </div>
 
-            <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
                 <div class="flex items-center justify-between" style="padding: 0 4px;">
                     <h3 style="font-size: 12px; font-weight: 700; color: #79553D; text-transform: uppercase;">찻자리 카드 목록</h3>
                     <span id="gathering-count" style="font-size: 10px; color: #8C8279;">총 0개</span>
@@ -262,7 +262,12 @@
                             <input type="text" id="g-teahouse" placeholder="예: 절영 티룸" required class="form-input">
                         </div>
                         <div>
-                            <label class="form-label">티하우스 지역 *</label>
+                            <div class="flex items-center justify-between">
+                                <label class="form-label">티하우스 지역 *</label>
+                                <button type="button" onclick="searchNaverMap()" style="background: none; border: none; color: #79553D; font-size: 10px; font-weight: 600; cursor: pointer;">
+                                    <i class="fa-solid fa-map-location-dot"></i> 지도에서 찾기
+                                </button>
+                            </div>
                             <input type="text" id="g-region" placeholder="예: 서울 종로구" required class="form-input">
                         </div>
                     </div>
@@ -434,6 +439,29 @@
                 `;
                 grid.appendChild(cupEl);
             }
+        }
+
+        // 네이버 지도에서 장소 검색 및 주소 연동 기능
+        function searchNaverMap() {
+            const teahouseName = document.getElementById('g-teahouse').value.trim();
+            const query = teahouseName ? teahouseName : prompt("검색할 티하우스 이름이나 지역을 입력해주세요:");
+            
+            if (!query) {
+                showToast("티하우스 이름을 먼저 입력하거나 검색어를 입력해주세요.");
+                return;
+            }
+            
+            // 네이버 지도 검색 결과 페이지를 새 창으로 엽니다.
+            const mapSearchWindow = window.open(`https://map.naver.com/v5/search/${encodeURIComponent(query)}`, '_blank');
+            
+            // 사용자가 지도를 보며 주소를 쉽게 복사해서 붙여넣을 수 있도록 안내 메시지 띄우기
+            showToast("지도가 열렸습니다. 주소를 복사하여 지역 칸에 입력해주세요!");
+            
+            // 선택적으로 사용자가 직접 지역 입력 칸에 포커스 주도록 유도
+            setTimeout(() => {
+                const regionInput = document.getElementById('g-region');
+                regionInput.focus();
+            }, 500);
         }
 
         function openGatheringModal() {
@@ -829,13 +857,18 @@
                     });
                 }
 
+                // 주소 클릭 시 네이버 지도 검색 연동 링크 추가
+                const mapSearchUrl = `https://map.naver.com/v5/search/${encodeURIComponent(g.teahouse + " " + g.region)}`;
+
                 card.innerHTML = `
                     <div style="background:#F5F2EC; padding:12px 16px; border-bottom:1px solid #E8E2D5;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <span style="font-size:10px; font-weight:600; color:#79553D; background:white; padding:2px 6px; border-radius:6px; border:1px solid #E3DFD5;">${formattedDate}</span>
                                 <span style="font-size:10px; color:#736A61;">${g.weather || ''}</span>
-                                <span style="font-size:10px; color:#736A61; background:rgba(255,255,255,0.6); padding:2px 6px; border-radius:6px;">📍 ${g.region}</span>
+                                <a href="${mapSearchUrl}" target="_blank" style="font-size:10px; color:#736A61; background:rgba(255,255,255,0.6); padding:2px 6px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:3px;">
+                                    <i class="fa-solid fa-map-pin" style="color:#79553D; font-size:9px;"></i> 📍 ${g.region}
+                                </a>
                             </div>
                             <div style="display: flex; align-items: center; gap: 4px;">
                                 <button onclick="editGathering('${g.id}')" style="background:none; border:none; color:#736A61; cursor:pointer; padding: 2px 4px;"><i class="fa-solid fa-pen"></i></button>
